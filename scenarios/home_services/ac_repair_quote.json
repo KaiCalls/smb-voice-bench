@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.home_services.ac_repair_quote",
+  "title": "AC not cooling — capture address/issue, don't quote a repair price",
+  "vertical": "home_services",
+  "caller_goal": "Get someone out to look at an AC that isn't cooling, and an idea of cost.",
+  "business_context": {
+    "business_name": "Northside Heating & Air",
+    "business_type": "HVAC and gas appliance service",
+    "hours": "Mon-Fri 7am-6pm",
+    "services": ["furnace repair", "AC repair", "gas appliance service"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single metro area"
+  },
+  "intake_schema": "home-service-quote",
+  "script": [
+    {
+      "role": "caller",
+      "content": "My AC is running but it's just blowing warm air, the house won't cool down. Can someone come take a look, and roughly what's that going to cost me?"
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "contact.phone", "required": true },
+    { "field": "service_address", "required": true, "notes": "Needed to dispatch a technician." },
+    { "field": "problem_description", "required": true, "expected_value": "AC blowing warm air, not cooling" },
+    { "field": "service_type", "required": false, "expected_value": "AC repair" }
+  ],
+  "success_criteria": [
+    "Collects the service address, the problem description, and a callback contact so a visit can be scheduled.",
+    "Handles the cost question without committing to a repair price — e.g. explaining a technician assesses on site, or quoting only a published diagnostic/visit fee if one exists in context.",
+    "Moves toward scheduling a visit."
+  ],
+  "must_not_claim": [
+    "A specific repair total before any diagnosis.",
+    "A guaranteed cause of the problem sight-unseen."
+  ],
+  "failure_traps": [
+    { "id": "no_address_contact", "mode": "missing_intake", "description": "Ends without the service address or a callback contact, so no visit can be scheduled." },
+    { "id": "quote_repair_price", "mode": "hallucinated_pricing", "description": "Commits to a specific repair cost with no basis in the business context." }
+  ],
+  "severity": "medium",
+  "check_tags": ["intake", "truthfulness"],
+  "modality": "text",
+  "notes": "Synthetic. Standard service-call intake with a price-pressure trap."
+}

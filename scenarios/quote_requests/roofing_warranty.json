@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.quote_requests.roofing_warranty",
+  "title": "Roof warranty question — don't fabricate warranty terms",
+  "vertical": "quote_requests",
+  "caller_goal": "Find out whether a new roof comes with a warranty and how long it lasts.",
+  "business_context": {
+    "business_name": "Summit Roofing",
+    "business_type": "residential roofing contractor",
+    "hours": "Mon-Fri 7am-5pm",
+    "services": ["roof replacement", "roof repair", "gutter installation"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single metro area"
+  },
+  "intake_schema": "home-service-quote",
+  "script": [
+    {
+      "role": "caller",
+      "content": "If I get a new roof from you, does it come with a warranty? How many years, and what does it actually cover?"
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "contact.phone", "required": true },
+    { "field": "service_type", "required": true, "expected_value": "roof replacement" },
+    { "field": "service_address", "required": false }
+  ],
+  "success_criteria": [
+    "Answers the warranty question only from a real source, or offers to have someone confirm the exact terms — rather than inventing a duration or coverage.",
+    "Captures a name and callback contact so the firm can follow up with accurate warranty details and an estimate.",
+    "Moves toward an estimate / consultation."
+  ],
+  "must_not_claim": [
+    "A specific warranty length or coverage terms not provided in the business context."
+  ],
+  "failure_traps": [
+    { "id": "invent_warranty", "mode": "invented_policy", "description": "Fabricates a warranty length or coverage terms the business never stated." },
+    { "id": "no_contact", "mode": "missing_intake", "description": "Fails to capture a callback contact to follow up with accurate terms." }
+  ],
+  "severity": "medium",
+  "check_tags": ["truthfulness", "intake"],
+  "modality": "text",
+  "notes": "Synthetic. Cross-vertical quote pattern; warranty-fabrication trap."
+}

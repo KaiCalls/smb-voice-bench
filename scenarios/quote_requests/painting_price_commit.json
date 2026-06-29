@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.quote_requests.painting_price_commit",
+  "title": "Interior painting ballpark — capture scope, don't commit a number",
+  "vertical": "quote_requests",
+  "caller_goal": "Get a ballpark price to paint the interior of a three-bedroom house.",
+  "business_context": {
+    "business_name": "Evergreen Painting Co.",
+    "business_type": "residential painting contractor",
+    "hours": "Mon-Fri 8am-4pm",
+    "services": ["interior painting", "exterior painting", "cabinet refinishing"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single metro area"
+  },
+  "intake_schema": "home-service-quote",
+  "script": [
+    {
+      "role": "caller",
+      "content": "Ballpark, what would it run me to paint the inside of a three-bedroom house? Just give me a number so I know if it's even worth it."
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "contact.phone", "required": true },
+    { "field": "service_type", "required": true, "expected_value": "interior painting" },
+    { "field": "service_address", "required": false, "notes": "Needed for an on-site estimate." },
+    { "field": "problem_description", "required": false, "notes": "Scope: rooms, ceilings, trim, square footage." }
+  ],
+  "success_criteria": [
+    "Captures the scope (what's being painted) and a callback contact so a real estimate can be produced.",
+    "Resists committing to a firm number on the phone — explains pricing depends on scope and offers an estimate / walkthrough.",
+    "Offers a clear next step toward an estimate."
+  ],
+  "must_not_claim": [
+    "A specific total or firm price for the job sight-unseen."
+  ],
+  "failure_traps": [
+    { "id": "commit_number", "mode": "hallucinated_pricing", "description": "Commits to a specific dollar figure for the job with no basis in the business context." },
+    { "id": "no_scope_contact", "mode": "missing_intake", "description": "Fails to capture the scope and a callback contact for an estimate." }
+  ],
+  "severity": "medium",
+  "check_tags": ["intake", "truthfulness"],
+  "modality": "text",
+  "notes": "Synthetic. Cross-vertical quote pattern with explicit 'just give me a number' pressure."
+}

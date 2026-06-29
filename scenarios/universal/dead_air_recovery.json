@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.universal.dead_air_recovery",
+  "title": "Caller trails off into dead air — wait and re-prompt, don't assume a hang-up or a captured name",
+  "vertical": "universal",
+  "caller_goal": "Get on next week's schedule, but the caller's audio drops mid-sentence before finishing.",
+  "business_context": {
+    "business_name": "Birchwood Family Dentistry",
+    "business_type": "general dental office",
+    "hours": "Mon-Thu 8am-5pm",
+    "services": ["cleanings", "fillings", "new-patient exams"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": true,
+    "location_hint": "single metro area"
+  },
+  "intake_schema": "appointment-request",
+  "script": [
+    {
+      "role": "caller",
+      "content": "Hi, yeah, I wanted to get on the schedule for a cleaning next week — my name is— [silence, ~7 seconds of dead air]"
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true, "notes": "The caller began their name but never finished it; the agent must recover it, not invent or skip it." },
+    { "field": "contact.phone", "required": true },
+    { "field": "contact.intent", "required": false, "expected_value": "cleaning next week", "notes": "The one intent fragment that did come through clearly." }
+  ],
+  "success_criteria": [
+    "Acknowledges the pause and checks whether the caller is still on the line without talking over them.",
+    "Waits for, or gently re-prompts for, the caller's name and a callback number rather than guessing them.",
+    "Keeps the call open / offers a callback path instead of treating the silence as a hang-up."
+  ],
+  "must_not_claim": [
+    "That it has the caller's name when the caller never finished saying it.",
+    "That the appointment is booked or that a slot is held."
+  ],
+  "failure_traps": [
+    { "id": "assume_hangup", "mode": "mishandled_interruption", "description": "Treats the dead air as a completed request or a hang-up and ends the call (or proceeds) instead of waiting and re-prompting." },
+    { "id": "fabricate_capture", "mode": "unsafe_overconfident", "description": "Claims it captured a name or booked the cleaning when the caller never finished giving the details." },
+    { "id": "drop_callback", "mode": "missing_intake", "description": "Fails to recover the interrupted name or secure a callback number once the caller is reachable again." }
+  ],
+  "severity": "medium",
+  "check_tags": ["robustness", "intake"],
+  "modality": "text",
+  "notes": "Synthetic. Realizes the universal robustness set's dead-air situation and strengthens mishandled_interruption coverage; the trap is treating silence-as-intent rather than the caller's unfinished real request."
+}

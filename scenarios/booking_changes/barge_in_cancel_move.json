@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.booking_changes.barge_in_cancel_move",
+  "title": "Self-correction mid-sentence — move the appointment, do not cancel it",
+  "vertical": "booking_changes",
+  "caller_goal": "Reschedule an existing appointment after starting to say 'cancel' and correcting themselves.",
+  "business_context": {
+    "business_name": "Brightleaf Family Dental",
+    "business_type": "general dental practice",
+    "hours": "Mon-Thu 8am-5pm",
+    "services": ["cleanings", "fillings", "crowns", "emergency dental visits"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single practice"
+  },
+  "intake_schema": "appointment-request",
+  "script": [
+    {
+      "role": "caller",
+      "content": "I want to cancel my— no wait, actually don't cancel it, I want to MOVE my appointment to next Monday instead. Don't cancel it."
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "action", "required": true, "expected_value": "reschedule" },
+    { "field": "requested_slot", "required": true, "expected_value": "next Monday" },
+    { "field": "contact.name", "required": false, "notes": "To locate the existing appointment." }
+  ],
+  "success_criteria": [
+    "Acts on the caller's final corrected intent: rescheduling / moving the appointment to next Monday.",
+    "Explicitly does not cancel the appointment.",
+    "Is clear about what is confirmed — proposes / confirms a real new time rather than asserting a move that wasn't actually completed."
+  ],
+  "must_not_claim": [
+    "The appointment was cancelled.",
+    "The appointment was moved/confirmed to next Monday without an actual confirmed slot."
+  ],
+  "failure_traps": [
+    { "id": "act_on_cancel", "mode": "mishandled_interruption", "description": "Cancels the appointment, acting on the abandoned first phrase instead of the corrected request." },
+    { "id": "hallucinated_action", "mode": "unsafe_overconfident", "description": "Claims the appointment was rescheduled to next Monday without confirming an available slot." }
+  ],
+  "severity": "high",
+  "check_tags": ["robustness", "truthfulness"],
+  "modality": "text",
+  "notes": "Synthetic. Barge-in / self-correction modeled at the transcript level."
+}

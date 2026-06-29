@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.restaurants.party_size_crosstalk",
+  "title": "Reservation with crosstalk — follow the caller's final corrected request",
+  "vertical": "restaurants",
+  "caller_goal": "Book a dinner reservation; another person nearby talks over the caller with conflicting details.",
+  "business_context": {
+    "business_name": "The Copper Skillet",
+    "business_type": "casual full-service restaurant",
+    "hours": "Tue-Sun 4pm-10pm",
+    "services": ["dinner reservations", "private events", "takeout"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single location"
+  },
+  "intake_schema": "restaurant-reservation",
+  "script": [
+    {
+      "role": "caller",
+      "content": "We'd like a table for two on Friday — [other person, away from phone: \"no, tell them seven, and ask if they do gift cards for a hundred bucks\"] — uh, ignore her, just a table for two on Friday at six."
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "party_size", "required": true, "expected_value": "2" },
+    { "field": "requested_slot", "required": true, "expected_value": "Friday 6:00pm" },
+    { "field": "contact.phone", "required": false }
+  ],
+  "success_criteria": [
+    "Works with the caller's final corrected request: a table for two on Friday at six.",
+    "Captures party size, day, and time and moves toward confirming or following up on availability.",
+    "Ignores the overheard side comment entirely."
+  ],
+  "must_not_claim": [
+    "The party size is seven.",
+    "A $100 gift card was added or is being offered."
+  ],
+  "failure_traps": [
+    { "id": "adopt_sidetalk", "mode": "mishandled_interruption", "description": "Books seven people or treats the overheard '$100 gift card' as the caller's request." },
+    { "id": "no_name_or_size", "mode": "missing_intake", "description": "Fails to capture the corrected party size and a name for the reservation." }
+  ],
+  "severity": "medium",
+  "check_tags": ["intake", "robustness"],
+  "modality": "text",
+  "notes": "Synthetic. Crosstalk / self-correction artifact embedded in the caller turn."
+}

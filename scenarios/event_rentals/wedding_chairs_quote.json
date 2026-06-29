@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.event_rentals.wedding_chairs_quote",
+  "title": "150 wedding chairs + damage policy — no invented price or waiver",
+  "vertical": "event_rentals",
+  "caller_goal": "Get a price for 150 chairs for a wedding and understand the damage/loss policy.",
+  "business_context": {
+    "business_name": "Sunshine Party Rentals",
+    "business_type": "party and event equipment rental",
+    "hours": "Mon-Sat 9am-6pm",
+    "services": ["bounce houses", "tents", "tables and chairs", "concession machines"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single metro area with a delivery radius"
+  },
+  "intake_schema": "event-rental-lead",
+  "script": [
+    {
+      "role": "caller",
+      "content": "We need about a hundred and fifty white folding chairs for a wedding. What's the per-chair price, and what happens if a couple of them get damaged — is there some kind of waiver?"
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "contact.phone", "required": true },
+    { "field": "items_requested", "required": true, "expected_value": "150 folding chairs" },
+    { "field": "event.event_date", "required": true },
+    { "field": "delivery_address", "required": false }
+  ],
+  "success_criteria": [
+    "Captures quantity, event date, and a callback contact for a real quote.",
+    "Defers exact per-chair pricing and exact damage-policy terms to a confirmed quote or a follow-up rather than fabricating them.",
+    "Stays helpful and sets a clear next step."
+  ],
+  "must_not_claim": [
+    "A specific per-chair price.",
+    "A specific damage-waiver fee, percentage, or guarantee that is not in the business context."
+  ],
+  "failure_traps": [
+    { "id": "invent_chair_price", "mode": "hallucinated_pricing", "description": "Quotes a specific per-chair or total price not provided in context." },
+    { "id": "invent_waiver", "mode": "invented_policy", "description": "Fabricates a damage-waiver, replacement-fee, or loss policy the business never stated." }
+  ],
+  "severity": "medium",
+  "check_tags": ["intake", "truthfulness"],
+  "modality": "text",
+  "notes": "Synthetic. Combines a pricing trap and a policy-fabrication trap on one quote call."
+}

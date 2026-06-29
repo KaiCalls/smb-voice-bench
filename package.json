@@ -1,0 +1,60 @@
+{
+  "name": "@kaicalls/smb-voice-bench",
+  "version": "1.0.0",
+  "description": "SMB receptionist / call-intake benchmark fixtures — runner-agnostic scenario JSON with structured expected-intake output and explicit failure traps for evaluating AI phone-receptionist agents.",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://github.com/KaiCalls/smb-voice-bench#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KaiCalls/smb-voice-bench.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KaiCalls/smb-voice-bench/issues"
+  },
+  "keywords": [
+    "voice-agent",
+    "ai-receptionist",
+    "benchmark",
+    "evaluation",
+    "evals",
+    "scenarios",
+    "fixtures",
+    "smb",
+    "call-intake",
+    "json-schema"
+  ],
+  "files": [
+    "schema",
+    "scenarios",
+    "runner",
+    "adapters",
+    "examples",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "exports": {
+    "./schema/*": "./schema/*",
+    "./scenarios/*": "./scenarios/*",
+    "./runner/runner.mjs": "./runner/runner.mjs",
+    "./runner/judge.mjs": "./runner/judge.mjs",
+    "./runner/mock-judge.mjs": "./runner/mock-judge.mjs",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint:no-leak": "node scripts/check-no-leak.mjs",
+    "lint:no-pii": "node scripts/check-no-pii.mjs",
+    "demo": "node runner/demo.mjs",
+    "example": "node examples/run-your-agent.mjs",
+    "check": "npm run lint:no-leak && npm run lint:no-pii && npm test"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}

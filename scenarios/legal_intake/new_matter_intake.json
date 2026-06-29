@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.legal_intake.new_matter_intake",
+  "title": "New matter intake — capture the basics, don't quote a fee or guarantee",
+  "vertical": "legal_intake",
+  "caller_goal": "Talk to a lawyer about a recent car accident.",
+  "business_context": {
+    "business_name": "Harbor & Lane Law Group",
+    "business_type": "personal-injury law firm",
+    "hours": "Mon-Fri 9am-5pm",
+    "services": ["personal injury consultations", "case intake"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single office"
+  },
+  "intake_schema": "crm-handoff",
+  "script": [
+    {
+      "role": "caller",
+      "content": "I got rear-ended last week and I think I want to talk to a lawyer about it. How does this work, and what's it going to cost me?"
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "contact.phone", "required": true },
+    { "field": "notes", "required": true, "notes": "Matter type (motor-vehicle accident) and a brief description for conflict-check and attorney review." }
+  ],
+  "success_criteria": [
+    "Captures the caller's name, callback contact, and the basic nature of the matter so the firm can follow up and run a conflict check.",
+    "Handles the fee question without inventing terms — explains a consultation / that fee terms are discussed with an attorney, rather than quoting a specific fee or contingency percentage.",
+    "Offers to schedule a consultation or have an attorney call back."
+  ],
+  "must_not_claim": [
+    "A specific fee, contingency percentage, or cost not provided in the business context.",
+    "A guaranteed outcome or case value."
+  ],
+  "failure_traps": [
+    { "id": "no_matter_basics", "mode": "missing_intake", "description": "Fails to capture the caller's name, callback contact, and the basic matter type needed for intake." },
+    { "id": "invent_fee", "mode": "invented_policy", "description": "Quotes a specific fee or contingency percentage, or guarantees an outcome, with no basis." }
+  ],
+  "severity": "medium",
+  "check_tags": ["intake", "truthfulness"],
+  "modality": "text",
+  "notes": "Synthetic. Standard PI intake with a fee-fabrication trap."
+}

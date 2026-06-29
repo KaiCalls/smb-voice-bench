@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kaicalls.github.io/smb-voice-bench/schema/v1/scenario.schema.json",
+  "title": "SMB Voice Bench Scenario",
+  "description": "A single runner-agnostic benchmark scenario for an AI phone-receptionist agent. One JSON object = one scripted call plus the rubric for grading the agent's judged turn(s): the structured data it should capture (expected_intake_fields) and the explicit ways to fail (failure_traps). The schema is independently versioned via `schemaVersion` and names no specific voice runtime. Field names under `expected_intake_fields[].field` follow the shared intake vocabulary documented in docs/scenario-schema.md (in this repo; no external dependency) so the same fixture can drive structured-extraction assertions on any harness.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "description": "Independently versioned schema tag. Lets the scenario shape evolve without coupling to any external schema's version.",
+      "const": "smb-voice-bench/v1"
+    },
+    "id": {
+      "type": "string",
+      "description": "Stable machine id with a dotted namespace: `smbvb.<vertical>.<slug>`. Safety / robustness fixtures use `smbvb.<vertical>.<slug>` too but carry `severity: critical` so consumers can filter the blocking set.",
+      "pattern": "^smbvb\\.[a-z_]+\\.[a-z0-9_]+$"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable one-line summary.",
+      "minLength": 1
+    },
+    "vertical": {
+      "type": "string",
+      "description": "The business vertical or cross-cutting situation the scenario lives in (`universal` = vertical-agnostic baseline / robustness).",
+      "enum": [
+        "event_rentals",
+        "home_services",
+        "restaurants",
+        "med_spas",
+        "dental_medical_intake",
+        "legal_intake",
+        "quote_requests",
+        "booking_changes",
+        "universal"
+      ]
+    },
+    "caller_goal": {
+      "type": "string",
+      "description": "What the caller is actually trying to accomplish, in plain language.",
+      "minLength": 1
+    },
+    "business_context": {
+      "type": "object",
+      "description": "Synthetic operating context the agent-under-test is assumed to have. All values are hand-authored and fictional; this replaces any per-business hydration with baked-in concrete values.",
+      "properties": {
+        "business_name": { "type": "string" },
+        "business_type": { "type": "string" },
+        "hours": { "type": "string" },
+        "services": { "type": "array", "items": { "type": "string" } },
+        "booking_enabled": { "type": "boolean" },
+        "payments_enabled": { "type": "boolean" },
+        "transfer_enabled": { "type": "boolean" },
+        "location_hint": { "type": "string" }
+      },
+      "required": ["business_name", "business_type", "hours", "services"],
+      "additionalProperties": false
+    },
+    "intake_schema": {
+      "type": "string",
+      "description": "Optional name of the shared intake outcome schema this call should produce, so a consumer can validate the agent's structured extraction against it. These outcome names are defined in docs/scenario-schema.md in this repo; the field is an optional hint, not an external dependency.",
+      "enum": [
+        "contact-core",
+        "appointment-request",
+        "home-service-quote",
+        "event-rental-lead",
+        "restaurant-reservation",
+        "missed-call-followup",
+        "emergency-escalation",
+        "crm-handoff"
+      ]
+    },
+    "script": {
+      "type": "array",
+      "description": "Ordered conversation turns. `caller` turns carry `content`; the final `agent` turn(s) marked `judged: true` are graded against the rubric. Intermediate scripted `agent` turns provide context and may omit `content`. Noise / interruption / self-correction artifacts are embedded inside `caller` turns using bracketed conventions (e.g. `[TV: \"...\"]`, `[silence]`, `— no wait, actually —`).",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string", "enum": ["caller", "agent"] },
+          "content": { "type": "string" },
+          "judged": {
+            "type": "boolean",
+            "description": "When true (only valid on `agent` turns) this turn is graded against success_criteria / failure_traps."
+          }
+        },
+        "required": ["role"],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": { "properties": { "role": { "const": "caller" } } },
+            "then": { "required": ["content"] }
+          }
+        ]
+      },
+      "contains": {
+        "type": "object",
+        "properties": {
+          "role": { "const": "agent" },
+          "judged": { "const": true }
+        },
+        "required": ["role", "judged"]
+      }
+    },
+    "expected_intake_fields": {
+      "type": "array",
+      "description": "The structured data a competent receptionist should capture on this call. `field` references a property name from the shared intake vocabulary (e.g. `contact.name`, `contact.phone`, `service_type`, `party_size`, `requested_slot`). A `required: true` field that is not captured trips a `missing_intake` failure.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean" },
+          "expected_value": { "type": "string" },
+          "notes": { "type": "string" }
+        },
+        "required": ["field", "required"],
+        "additionalProperties": false
+      }
+    },
+    "success_criteria": {
+      "type": "array",
+      "description": "Positive, independently checkable conditions the judged turn must satisfy.",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "failure_traps": {
+      "type": "array",
+      "description": "The explicit ways to fail this scenario. Every scenario lists at least one. `id` is a short slug for the specific trap (it MAY name a precise sub-trap such as `hallucinated_action`); `mode` is the canonical failure mode from the closed taxonomy.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "mode": {
+            "type": "string",
+            "description": "Canonical failure mode. `hallucinated_action` (claiming a real-world action happened without proof) is modeled as the action-side instance of `unsafe_overconfident`; use that mode and name the trap `id` accordingly.",
+            "enum": [
+              "hallucinated_pricing",
+              "invented_policy",
+              "missing_intake",
+              "failure_to_escalate",
+              "mishandled_interruption",
+              "unsafe_overconfident"
+            ]
+          },
+          "description": { "type": "string", "minLength": 1 }
+        },
+        "required": ["id", "mode", "description"],
+        "additionalProperties": false
+      }
+    },
+    "must_not_claim": {
+      "type": "array",
+      "description": "Specific assertions the agent must never make. A quick-consume subset of failure_traps.",
+      "items": { "type": "string" }
+    },
+    "must_escalate_if": {
+      "type": "array",
+      "description": "Conditions that require escalation / redirect (e.g. life-safety emergency -> direct to emergency services; binding legal/medical advice requested -> defer to a professional).",
+      "items": { "type": "string" }
+    },
+    "severity": {
+      "type": "string",
+      "description": "Triage hint. `critical` scenarios are blocking: a consuming harness should fail the whole run if a blocking scenario fails.",
+      "enum": ["low", "medium", "high", "critical"],
+      "default": "medium"
+    },
+    "check_tags": {
+      "type": "array",
+      "description": "Optional rollup tags so consumers can group fixtures into coverage categories.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "intake",
+          "truthfulness",
+          "guardrails",
+          "escalation",
+          "identity",
+          "behavior",
+          "robustness"
+        ]
+      }
+    },
+    "modality": {
+      "type": "string",
+      "description": "Reserved for a future audio pack. v1 ships `text` only.",
+      "enum": ["text", "audio"],
+      "default": "text"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Authoring rationale / provenance. All fixtures are synthetic and hand-authored."
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "title",
+    "vertical",
+    "caller_goal",
+    "business_context",
+    "script",
+    "expected_intake_fields",
+    "success_criteria",
+    "failure_traps"
+  ],
+  "additionalProperties": false
+}

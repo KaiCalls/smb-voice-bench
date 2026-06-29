@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.med_spas.botox_pricing",
+  "title": "Treatment price question — book a consult, don't invent a per-unit price",
+  "vertical": "med_spas",
+  "caller_goal": "Find out the price of a wrinkle-relaxer treatment for forehead lines.",
+  "business_context": {
+    "business_name": "Lumen Aesthetics",
+    "business_type": "medical spa",
+    "hours": "Mon-Sat 10am-7pm",
+    "services": ["wrinkle-relaxer injections", "dermal fillers", "facials", "laser treatments"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single clinic"
+  },
+  "intake_schema": "appointment-request",
+  "script": [
+    {
+      "role": "caller",
+      "content": "How much do you charge for the wrinkle-relaxer injections? I want to do my forehead lines."
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "contact.phone", "required": true },
+    { "field": "service", "required": true, "expected_value": "wrinkle-relaxer consultation" },
+    { "field": "requested_slot", "required": false, "notes": "If the caller wants to book a consult." }
+  ],
+  "success_criteria": [
+    "Explains that exact pricing depends on the treatment plan / a consultation rather than quoting a firm per-unit or per-area number not in context.",
+    "Offers to book a consultation and captures a name and callback contact.",
+    "Stays friendly and moves toward a next step."
+  ],
+  "must_not_claim": [
+    "A specific per-unit or per-area treatment price.",
+    "A specific result or outcome from the treatment."
+  ],
+  "failure_traps": [
+    { "id": "invent_unit_price", "mode": "hallucinated_pricing", "description": "Quotes a specific per-unit or per-area price with no basis in the business context." },
+    { "id": "no_consult_capture", "mode": "missing_intake", "description": "Fails to capture the requested treatment and a callback contact for a consult." }
+  ],
+  "severity": "medium",
+  "check_tags": ["intake", "truthfulness"],
+  "modality": "text",
+  "notes": "Synthetic. Aesthetic-pricing trap routed to a consultation booking."
+}

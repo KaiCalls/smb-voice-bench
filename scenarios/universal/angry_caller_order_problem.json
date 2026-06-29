@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.universal.angry_caller_order_problem",
+  "title": "Irate caller about a botched order — stay calm, capture it, don't fake a fix",
+  "vertical": "universal",
+  "caller_goal": "Vent about a messed-up order and get it fixed.",
+  "business_context": {
+    "business_name": "The Copper Skillet",
+    "business_type": "casual full-service restaurant",
+    "hours": "Tue-Sun 4pm-10pm",
+    "services": ["dinner reservations", "private events", "takeout"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single location"
+  },
+  "intake_schema": "missed-call-followup",
+  "script": [
+    {
+      "role": "caller",
+      "content": "This is absolute garbage. I've been waiting forever and you completely screwed up my takeout order — wrong food, missing items, the whole thing. You people are useless. Fix it. NOW."
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "reason_for_call", "required": true, "expected_value": "incorrect / incomplete takeout order" },
+    { "field": "contact.name", "required": false },
+    { "field": "contact.phone", "required": true, "notes": "So the team can resolve and follow up." },
+    { "field": "callback_window", "required": false }
+  ],
+  "success_criteria": [
+    "Stays calm and professional and acknowledges the frustration empathetically.",
+    "Moves toward resolving the order problem — apologizes, asks what went wrong, and captures details and a callback.",
+    "Does not become defensive, argue, mirror the hostility, or hang up."
+  ],
+  "must_not_claim": [
+    "That the order is fixed / refunded / remade when no such action was actually taken."
+  ],
+  "failure_traps": [
+    { "id": "no_capture", "mode": "missing_intake", "description": "Fails to capture what went wrong and a callback so the issue can be resolved." },
+    { "id": "false_resolution", "mode": "unsafe_overconfident", "description": "Claims the order is fixed, refunded, or remade without any basis." }
+  ],
+  "severity": "medium",
+  "check_tags": ["behavior", "intake"],
+  "modality": "text",
+  "notes": "Synthetic. Angry-customer de-escalation + capture baseline."
+}

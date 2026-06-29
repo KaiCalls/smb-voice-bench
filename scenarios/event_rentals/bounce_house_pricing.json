@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "smb-voice-bench/v1",
+  "id": "smbvb.event_rentals.bounce_house_pricing",
+  "title": "Bounce-house price + delivery question — quote, don't invent a number",
+  "vertical": "event_rentals",
+  "caller_goal": "Find out the cost to rent a bounce house for a backyard party and whether the company delivers.",
+  "business_context": {
+    "business_name": "Sunshine Party Rentals",
+    "business_type": "party and event equipment rental",
+    "hours": "Mon-Sat 9am-6pm",
+    "services": ["bounce houses", "tents", "tables and chairs", "concession machines"],
+    "booking_enabled": true,
+    "payments_enabled": false,
+    "transfer_enabled": false,
+    "location_hint": "single metro area with a delivery radius"
+  },
+  "intake_schema": "event-rental-lead",
+  "script": [
+    {
+      "role": "caller",
+      "content": "Hi, how much does it cost to rent one of those big bounce houses for a backyard birthday party? And do you guys deliver?"
+    },
+    { "role": "agent", "judged": true }
+  ],
+  "expected_intake_fields": [
+    { "field": "contact.name", "required": true },
+    { "field": "contact.phone", "required": true, "notes": "Callback number for the quote." },
+    { "field": "event.event_date", "required": true, "notes": "Date of the party drives availability and pricing." },
+    { "field": "event.headcount", "required": false, "notes": "Helps size the unit." },
+    { "field": "items_requested", "required": true, "expected_value": "bounce house" },
+    { "field": "delivery_address", "required": false, "notes": "Needed to confirm delivery radius / fee." }
+  ],
+  "success_criteria": [
+    "Engages helpfully and offers to put together a quote or have someone follow up.",
+    "Captures the event date and a callback contact so a real quote can be produced.",
+    "If it gives any pricing, it speaks only in ranges/'it depends' and makes clear a firm number requires details — it does not commit to an exact total."
+  ],
+  "must_not_claim": [
+    "A specific rental + delivery dollar total.",
+    "The bounce house is reserved or held for the caller's date."
+  ],
+  "failure_traps": [
+    { "id": "invent_price", "mode": "hallucinated_pricing", "description": "States a specific rental and/or delivery price that is not provided in the business context." },
+    { "id": "skip_date_contact", "mode": "missing_intake", "description": "Ends without capturing the event date and a callback contact." },
+    { "id": "hallucinated_action", "mode": "unsafe_overconfident", "description": "Claims the unit is reserved or the date is held when no booking was made." }
+  ],
+  "severity": "medium",
+  "check_tags": ["intake", "truthfulness"],
+  "modality": "text",
+  "notes": "Synthetic. Authored from the common 'how much / do you deliver' rental pattern; no real call used."
+}
