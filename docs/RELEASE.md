@@ -1,6 +1,6 @@
-# Proposed v0.1.0 release — not published
+# v0.1.0 GitHub release
 
-Source: `KaiCalls/smb-voice-bench`. The merged source preserves the historical fixture pack and contains the Python toolkit at the repository root; implementation acceptance is recorded in docs/ACCEPTANCE.md. Repository review does not publish a package or approve a release. The private integration bridge is excluded from this repository.
+Source: `KaiCalls/smb-voice-bench`. The merged source preserves the historical fixture pack and contains the Python toolkit at the repository root; implementation acceptance is recorded in docs/ACCEPTANCE.md. The maintainer explicitly authorized initial GitHub release publication on October 20, 2026. The private integration bridge is excluded from this repository.
 
 ## Review gates
 
@@ -9,8 +9,8 @@ Source: `KaiCalls/smb-voice-bench`. The merged source preserves the historical f
 - Wheel installed in a fresh environment outside the source tree; catalog, demo, validation, evaluation and report work.
 - Chromium and Firefox at 375px/1280px, direct file and loopback; keyboard/focus, no remote assets, inert hostile transcript, pagination and actual audio seek checked.
 - Public file allowlist, filename/content/metadata/archive scan, MIT choice and dependency license metadata reviewed. Audio/private evidence never enters the extraction.
-- Release archives have reproducible checksums. Signing remains a release action; no signing identity is fabricated.
-- **An independent person must complete the quickstart before package readiness is declared.** Automated clean-install checks do not satisfy this human gate.
+- Release archives have SHA-256 checksums and GitHub Actions/Sigstore signed build provenance bound to the version tag.
+- Independent-person quickstart remains unrecorded. The maintainer authorized this initial engineering publication after automated acceptance; no independent human review is claimed.
 
 The release artifact directory contains a reference-only local demo, owner and technical screenshots, a 60–90 second screen recording and verification receipts. The video is a browser walkthrough of scripted text/tool evidence, not a live voice test. These development artifacts are separate from the public package allowlist and exclude private recordings.
 
@@ -24,7 +24,7 @@ python tools/check_public.py --dist /absolute/path/to/reviewed-distributions
 
 Build with the locked runtime dependencies and the pinned build backend. Inspect both wheel and source archive before extracting allowlisted source to the intended destination. Existing hosting remains unchanged; the static report can open directly from disk. No ChatGPT Site is used.
 
-Publication commands and signing must be prepared against the final approved destination and credentials during the separate release action. This package has no publish/deploy command. Three external teams using it more than once is a future adoption check, not an achieved result or a prerequisite falsely claimed here.
+The pinned `.github/workflows/release.yml` builds and checks version-tagged source, signs build provenance and publishes assets to this repository’s GitHub Releases. Only an explicit version tag triggers publication. See docs/releases/v0.1.0.md for installation and signature verification. This package has no publish/deploy command. Three external teams using it more than once is a future adoption check, not an achieved result or a prerequisite falsely claimed here.
 
 ## Proposed announcement (draft only)
 

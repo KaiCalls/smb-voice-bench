@@ -10,3 +10,4 @@ recursive-include src/smb_voice_bench *.py *.json *.js *.css
 exclude src/smb_voice_bench.egg-info/*
 global-exclude *.py[cod]
 include requirements-dev.in requirements-dev.lock
+include .github/workflows/release.yml

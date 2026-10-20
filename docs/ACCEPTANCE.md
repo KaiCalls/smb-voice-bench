@@ -29,4 +29,4 @@ The final viewer checks passed in Chromium and Firefox at 375px and 1280px, dire
 
 ## Release boundary
 
-The code can be used from this repository or a locally built wheel now. Package 0.1.0 remains unpublished. An independent person must still complete the quickstart before package readiness is declared; automated acceptance does not impersonate that person. Signing, package publication, announcements and outreach require a separate release action. No real speech/listening or production-readiness claim follows from these reference checks.
+The code can be used from this repository or a locally built wheel now. The maintainer authorized v0.1.0 as an initial GitHub engineering release after automated acceptance. An independent-person quickstart has not been recorded; automated acceptance does not impersonate that person. Release assets include checksums and signed build provenance. PyPI distribution, announcements and outreach are separate actions. No real speech/listening or production-readiness claim follows from these reference checks.
