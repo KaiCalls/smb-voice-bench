@@ -8,6 +8,10 @@ This local Python toolkit checks caller-authorized business outcomes against syn
 
 The original JavaScript fixture pack is preserved in [legacy/fixture-pack-v1](legacy/fixture-pack-v1/README.md). Its 25 fixtures and npm version are separate from this seven-scenario Python draft; see [migration notes](docs/MIGRATION.md).
 
+## Release downloads
+
+[v0.1.0 GitHub release](https://github.com/KaiCalls/smb-voice-bench/releases/tag/v0.1.0) provides the installable wheel, source archive, locked dependencies, checksums and signed build provenance. See [release installation and verification](docs/releases/v0.1.0.md). Distribution uses GitHub release assets; a PyPI upload is not configured.
+
 ## Quickstart
 
 Use Python 3.10 or later on macOS or Linux/POSIX in an isolated environment. Descriptor-based no-follow filesystem checks are required; Windows is not supported in this initial version. CI checks Python 3.10 and 3.12. From this package directory:
@@ -69,7 +73,7 @@ Functional, evidence, truthfulness, timing, listening and repeatability are sepa
 
 ## Implementation acceptance
 
-The offline v0.1 implementation is complete for the seven-scenario scope. See [acceptance evidence and reproduction](docs/ACCEPTANCE.md). To exercise every installed command, run `python /absolute/checkout/tools/verify_install.py --output ./acceptance-report` from a separate temporary directory with `PYTHONPATH` unset. This checks actual installed code, reference outcomes, imports, report regeneration and failure paths without network or credentials. Package publication and independent-person quickstart review remain separate.
+The offline v0.1 implementation is complete for the seven-scenario scope. See [acceptance evidence and reproduction](docs/ACCEPTANCE.md). To exercise every installed command, run `python /absolute/checkout/tools/verify_install.py --output ./acceptance-report` from a separate temporary directory with `PYTHONPATH` unset. This checks actual installed code, reference outcomes, imports, report regeneration and failure paths without network or credentials. The maintainer authorized the initial GitHub engineering release after automated acceptance; an independent-person quickstart has not been recorded.
 
 ## Develop and contribute
 

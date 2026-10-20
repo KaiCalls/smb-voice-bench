@@ -8,4 +8,4 @@ The old pack has 25 broad intake fixtures; the new toolkit has seven focused boo
 
 Both source families use MIT; their notices are retained. The Python wheel and source distribution include only active allowlisted toolkit files. The historical directory, local outputs, media, customer data, provider transports and private integration bridge are excluded from those archives. The source repository retains the historical snapshot for inspection.
 
-The source migration is merged; Python package 0.1.0 remains unreleased. Independent-person quickstart review and a separate release decision remain pending. Reference traces and synthetic PCM unit fixtures establish software behavior only; they cannot establish real speech quality or production readiness.
+The source migration is merged; Python package 0.1.0 is distributed through GitHub release assets. The maintainer authorized initial GitHub publication; independent-person quickstart review remains unrecorded. Reference traces and synthetic PCM unit fixtures establish software behavior only; they cannot establish real speech quality or production readiness.
