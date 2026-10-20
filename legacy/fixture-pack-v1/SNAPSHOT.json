@@ -1,0 +1,235 @@
+{
+  "kind": "historical_snapshot",
+  "schema_version": "0.1.0",
+  "source_commit": "a5be8a6088af83fdde69ab253b89292557f7f0cb",
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "7fbd06f39626782bad6eea0684d833bbe314fd0764af356166506989928cc684"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "08679dd76a94871791db5f447c560ecf2d46e6ffaea07cf28be65462f53aa608"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "518f7445e5cddd8609ec9121a43fb7648efdce5a38f9b4c171b24b6ee935ec8b"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "7acf2ac025ac8b607553245b00d6db9a71de76ea4276bb3f52965a6d82266ca1"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "6fe3f55603b0670c047669b2f3a145384b828ee146479816731c68b5fac701ab"
+    },
+    {
+      "path": "README.md",
+      "sha256": "345ef62554a06640efa49e75ba52403f9455ad350a679c8297ad1cd0a15cc23e"
+    },
+    {
+      "path": "adapters/README.md",
+      "sha256": "400cc2e6bdf89af5c3b948781b9e55ce22ae813af190fdc34c51d26159a46f64"
+    },
+    {
+      "path": "adapters/eva/README.md",
+      "sha256": "39fbf0539705481c8029748966ff501debfb590baa25ee465632ecc26e9a4c3a"
+    },
+    {
+      "path": "adapters/eva/convert.mjs",
+      "sha256": "3778238251c8f04150472a18c26483d9f8aee3b4df624361c3ebea048fb5263f"
+    },
+    {
+      "path": "adapters/livekit/README.md",
+      "sha256": "09b5b9fe7e27f5d4c177f9cddaaa7a9830ac205ca646403ae496488b050e58f7"
+    },
+    {
+      "path": "adapters/livekit/convert.mjs",
+      "sha256": "ea58e8209b84cc313d59c17859d25bcbc62e39bb6193f3c7db7969fb84bdec52"
+    },
+    {
+      "path": "docs/failure-modes.md",
+      "sha256": "88e6484a5a460e8418eddc7cbbb8365cc458ee7492fb5c47b9431fe714170e65"
+    },
+    {
+      "path": "docs/scenario-schema.md",
+      "sha256": "2ecee94d415bdbcc0c7003f11704fde6ea37b4be8b750dec688628f640e97ef8"
+    },
+    {
+      "path": "docs/scoring-and-judging.md",
+      "sha256": "97f925c0d06c2244e721bce168fc71d075d892d83cd2f66a8324c04db884fe0e"
+    },
+    {
+      "path": "examples/README.md",
+      "sha256": "b6e3274d811129717907c991940d4df0abfedf0e2cbdbae23bc87e05924d03dc"
+    },
+    {
+      "path": "examples/python/run_bench.py",
+      "sha256": "359a734512ecf9d8361d05bc62fe4298ab9d37c10f30e568f190a98193f6a6dc"
+    },
+    {
+      "path": "examples/run-your-agent.mjs",
+      "sha256": "0101bf86a3eb6617b6a178077c43332b014ceea2edda48caec0b16ea111de2e7"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "d2328ca7f73ae58886baa746d9e5dca988baf812e5e1ec041750936c36f9d4d0"
+    },
+    {
+      "path": "package.json",
+      "sha256": "8acdcfcafc8e694a09d6edb8200599329e21ce007a7ade788cc2dca63e04dac2"
+    },
+    {
+      "path": "runner/README.md",
+      "sha256": "ad846e36efc7f067c4adfabbfcf8fcc02e1358923905be6f856c5ec985992d7f"
+    },
+    {
+      "path": "runner/demo.mjs",
+      "sha256": "b8ab4eb2e7bae0d0daf5b43bfe01708c8382c042404f388dfa9774fd02b5d96a"
+    },
+    {
+      "path": "runner/judge.mjs",
+      "sha256": "cb253fb60e1aef561069e65ecf03ad8d6fb06c30aea8227e6a09bbda3b95f766"
+    },
+    {
+      "path": "runner/mock-judge.mjs",
+      "sha256": "a4fc17ee9d4ff2fcfdcefc8d297f5dd605655e962defc07b65f3808b2ee3f445"
+    },
+    {
+      "path": "runner/runner.mjs",
+      "sha256": "847ab41290d741722832c80c45575316d069b04271e79c8275e6c8a8fd6e9983"
+    },
+    {
+      "path": "runner/stub-agents.mjs",
+      "sha256": "db31411412d6cd214ff15e93c74020af2a6b97d8d9c50207735aa2c1ef29fed8"
+    },
+    {
+      "path": "scenarios/booking_changes/barge_in_cancel_move.json",
+      "sha256": "a3b69189a93d46b7933ec595994f3cff0f5a6aa599a6e9a65347f4a17ee2fda1"
+    },
+    {
+      "path": "scenarios/booking_changes/which_appointment.json",
+      "sha256": "aef1bca9b3e56c0e588695807dd1f27aac4cd2b5013697978cd55ee3ba5435ed"
+    },
+    {
+      "path": "scenarios/dental_medical_intake/chest_pain_emergency.json",
+      "sha256": "fb04e52bba3a515227d66d46705fac340c6437d6db61215c61fd90d66f1ce703"
+    },
+    {
+      "path": "scenarios/dental_medical_intake/new_patient_booking.json",
+      "sha256": "8d2be01c1015736d31d32fa1c54b2b39331fc68bc9ece2badd7e855ebba12ef6"
+    },
+    {
+      "path": "scenarios/dental_medical_intake/tooth_pain_dosage.json",
+      "sha256": "508a055a055a372e8debcda98b0ef7ba2e19bbb87436ddbcb28358129fd6e012"
+    },
+    {
+      "path": "scenarios/event_rentals/bounce_house_pricing.json",
+      "sha256": "4b5c7f3c81acb80d2cf1cac8bb0b016b00f8d34a112268da7c242aea258f1182"
+    },
+    {
+      "path": "scenarios/event_rentals/tent_reservation_hold.json",
+      "sha256": "6515b3d9a94c24586b7c439fdf62d1f161b52c77deef9a8cc736ca26a8c78fa0"
+    },
+    {
+      "path": "scenarios/event_rentals/wedding_chairs_quote.json",
+      "sha256": "a52db669f631bae3f0a33dc0d746d545f5c9f0c175c9936cd2d7c1490a6942c5"
+    },
+    {
+      "path": "scenarios/home_services/ac_repair_quote.json",
+      "sha256": "91ff2a1cea3f0d03251c316cdb0f4684d7535d7c5c9691e794fe250de5378130"
+    },
+    {
+      "path": "scenarios/home_services/after_hours_water_heater_leak.json",
+      "sha256": "c3576f0330a8d8e79a269d19c52897e1b671ddd2c037de3a9b31dda826ee3135"
+    },
+    {
+      "path": "scenarios/home_services/gas_smell_emergency.json",
+      "sha256": "924b2c626c5d8d56bd20a7e9e8eaadc06b1f86684d7bb9f3e550a61ecb3f6a5f"
+    },
+    {
+      "path": "scenarios/legal_intake/new_matter_intake.json",
+      "sha256": "fb3e0e4074ee3f3774ffbff8cfbc798602ad6c00e76a0bdf09c65467c64322ef"
+    },
+    {
+      "path": "scenarios/legal_intake/settle_or_sue.json",
+      "sha256": "2fbf3fddc2ef195e9b19e3237098e5d6bf71b4996b09d8992bcb72abd02b83b5"
+    },
+    {
+      "path": "scenarios/med_spas/botox_pricing.json",
+      "sha256": "6514897491c24bbbc74183c75b5be45a441acd824af041d0cd6f45778a8b5349"
+    },
+    {
+      "path": "scenarios/med_spas/filler_contraindication.json",
+      "sha256": "88c0fe5cfb15908d81f1efaca4825548f2c0121e402da8c45317fc89b5f7fd6f"
+    },
+    {
+      "path": "scenarios/quote_requests/painting_price_commit.json",
+      "sha256": "ccb5cad3a28669e6fa49f442151ffe2d8583466c84fe23530d4d2d812feea5f0"
+    },
+    {
+      "path": "scenarios/quote_requests/roofing_warranty.json",
+      "sha256": "44fe3431a9eb1278601fd9d358b5a5745ca1589c986df1ee579be753f5874f2b"
+    },
+    {
+      "path": "scenarios/restaurants/gift_card_allergen.json",
+      "sha256": "953db8111b710441021aea91e52d4dc12e5366cb02bf113181f23aba2c141c74"
+    },
+    {
+      "path": "scenarios/restaurants/party_size_crosstalk.json",
+      "sha256": "1a7f34826b0d05bb8ea8c681dda546a90d42b2b720517cd6b9de10b7eb81ea4e"
+    },
+    {
+      "path": "scenarios/universal/angry_caller_order_problem.json",
+      "sha256": "8c592c4fae1ecf8e9483f8d1a355f00e49dd121e4a5a9f89550f8dca698e32e4"
+    },
+    {
+      "path": "scenarios/universal/dead_air_recovery.json",
+      "sha256": "184bfd78b5932f70c72a72678667fe475ab3417aa7278288675065845f627ecf"
+    },
+    {
+      "path": "scenarios/universal/identity_who_did_i_reach.json",
+      "sha256": "c630e1061603aa5c2c6be39731595842880edb068070439d6b3ce6b59f843311"
+    },
+    {
+      "path": "scenarios/universal/prompt_injection.json",
+      "sha256": "297ae9e223ca389f094f566788702e00e4a94eb91cb601ae057193fccedc0ab8"
+    },
+    {
+      "path": "scenarios/universal/sensitive_card_read_aloud.json",
+      "sha256": "f2a4dba37d1406ddb901456a950def0e23499a02c6dd3ee3e69d9e84028514de"
+    },
+    {
+      "path": "scenarios/universal/spam_solicitor.json",
+      "sha256": "bcadaa3ae2bf95a5e693c4e4c9adf21a99839675bde26d503f209f68fcf20045"
+    },
+    {
+      "path": "schema/scenario.schema.json",
+      "sha256": "c6ca5a2e02458901449c9ca8ac9ac8a8ae0222f1a1fd70722f324cddab1f61b2"
+    },
+    {
+      "path": "scripts/check-no-leak.mjs",
+      "sha256": "df82845dfe04a74b2c2ea5ee300adb315b88e37c11078db8395a2287e66a2366"
+    },
+    {
+      "path": "scripts/check-no-pii.mjs",
+      "sha256": "ab3fa0274f9bce82db8d5079429004cdc33a4081b4efb337269341bad890c603"
+    },
+    {
+      "path": "test/adapters.test.mjs",
+      "sha256": "43db5158f6ebd6c4b5bed06e354134c10f6c59f714050788a333c387cb57fb5f"
+    },
+    {
+      "path": "test/coverage.test.mjs",
+      "sha256": "af1e3dced6526ec98c048f798c108a4292ba35f1b35d3a0829330dfd1cd2dcae"
+    },
+    {
+      "path": "test/runner-selftest.test.mjs",
+      "sha256": "172a0a14be3e9ca2e1595a7ca70ba975dbd04eb9657c0a3aaab4e886efda798d"
+    },
+    {
+      "path": "test/validate-scenarios.test.mjs",
+      "sha256": "8deb2e8c87c88c9c84982fb479129397a465d5389907b6a23978c3970e87e12e"
+    }
+  ]
+}

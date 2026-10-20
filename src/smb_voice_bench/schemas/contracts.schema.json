@@ -1,0 +1,3682 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:smb-voice-bench:contracts:0.1.0",
+  "title": "SMB voice bench contracts version 0.1.0",
+  "$comment": "Specification artifact. Runtime semantic validation is additionally required by BUILD_SPEC.md.",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,127}$",
+      "minLength": 1,
+      "maxLength": 128,
+      "not": {
+        "pattern": "[^a-z0-9_-]"
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:\\x00])[A-Za-z0-9_./-]+$"
+    },
+    "utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "fail",
+        "unknown",
+        "not_applicable"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "completed",
+        "partial",
+        "declined",
+        "failed",
+        "unknown"
+      ]
+    },
+    "evidence_ref": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/$defs/id"
+        },
+        "event_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "artifact_id",
+        "event_id",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "slot": {
+      "type": "object",
+      "properties": {
+        "slot_id": {
+          "$ref": "#/$defs/id"
+        },
+        "starts_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "service": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "slot_id",
+        "starts_at",
+        "service"
+      ],
+      "additionalProperties": false
+    },
+    "expected": {
+      "type": "object",
+      "properties": {
+        "booking_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "booking_attempt_limit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "slot_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "caller_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "service": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "confirmation_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "business_outcome": {
+          "$ref": "#/$defs/outcome"
+        },
+        "confirmation_attempt_limit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        }
+      },
+      "required": [
+        "booking_count",
+        "booking_attempt_limit",
+        "slot_id",
+        "caller_name",
+        "service",
+        "confirmation_count",
+        "business_outcome",
+        "confirmation_attempt_limit"
+      ],
+      "additionalProperties": false
+    },
+    "caller_turn": {
+      "type": "object",
+      "properties": {
+        "turn_id": {
+          "$ref": "#/$defs/id"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "trigger": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "after_assistant_outcome",
+                "during_assistant_greeting"
+              ]
+            },
+            "delay_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 90000
+            }
+          },
+          "required": [
+            "kind",
+            "delay_ms"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "turn_id",
+        "text",
+        "trigger"
+      ],
+      "additionalProperties": false
+    },
+    "permission_spec": {
+      "type": "object",
+      "properties": {
+        "turn_id": {
+          "$ref": "#/$defs/id"
+        },
+        "slot_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "booking": {
+          "type": "boolean"
+        },
+        "confirmation": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "turn_id",
+        "slot_id",
+        "booking",
+        "confirmation"
+      ],
+      "additionalProperties": false
+    },
+    "assertion": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "booking_count"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "booking_slot"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "booking_intake"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "object",
+              "properties": {
+                "caller_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "service": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                }
+              },
+              "required": [
+                "caller_name",
+                "service"
+              ],
+              "additionalProperties": false
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "booking_authorized"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "boolean"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "booking_attempt_limit"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "confirmation_count"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "confirmation_authorized"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "boolean"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "returned_ids_and_order"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "boolean"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "read_after_unknown_before_confirmation"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "boolean"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "no_write_attempts"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "boolean"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "fault_exercised"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "boolean"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "final_status_truthful"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "boolean"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "check_id": {
+              "const": "confirmation_attempt_limit"
+            },
+            "critical": {
+              "type": "boolean"
+            },
+            "expected": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "events",
+                  "state",
+                  "audio",
+                  "human_review"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "check_id",
+            "critical",
+            "expected",
+            "evidence"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "scenario"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "scenario_id": {
+          "$ref": "#/$defs/id"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "outcome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "synthetic_clock": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "business_context": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "service": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "slots": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/slot"
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "minItems": 1,
+              "maxItems": 32
+            }
+          },
+          "required": [
+            "name",
+            "service",
+            "slots",
+            "rules"
+          ],
+          "additionalProperties": false
+        },
+        "required_intake_fields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "caller_name",
+              "service",
+              "slot_id",
+              "booking_permission",
+              "confirmation_permission"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "caller_turns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/caller_turn"
+          },
+          "minItems": 1,
+          "maxItems": 12
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/permission_spec"
+          },
+          "minItems": 0,
+          "maxItems": 12
+        },
+        "fault": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "enum": [
+                "none",
+                "unknown_write",
+                "message_failure",
+                "slow_lookup",
+                "greeting_interruption"
+              ]
+            },
+            "delay_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 90000
+            }
+          },
+          "required": [
+            "mode",
+            "delay_ms"
+          ],
+          "additionalProperties": false
+        },
+        "expected": {
+          "$ref": "#/$defs/expected"
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assertion"
+          },
+          "minItems": 1,
+          "maxItems": 32
+        },
+        "required_evidence": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "events",
+              "state",
+              "audio",
+              "human_review"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 4
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "scenario_id",
+        "revision",
+        "title",
+        "outcome",
+        "synthetic_clock",
+        "timezone",
+        "business_context",
+        "required_intake_fields",
+        "caller_turns",
+        "permissions",
+        "fault",
+        "expected",
+        "assertions",
+        "required_evidence",
+        "extensions"
+      ],
+      "additionalProperties": false
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "configuration"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "candidate_id": {
+          "$ref": "#/$defs/id"
+        },
+        "agent_kind": {
+          "enum": [
+            "reference-good",
+            "reference-bad",
+            "external"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "contains_secrets": {
+          "const": false
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "candidate_id",
+        "agent_kind",
+        "description",
+        "parameters",
+        "contains_secrets",
+        "extensions"
+      ],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "event"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "event_id": {
+          "$ref": "#/$defs/id"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "journey_id": {
+          "$ref": "#/$defs/id"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 90000
+        },
+        "type": {
+          "enum": [
+            "run.started",
+            "caller.turn_started",
+            "caller.turn_completed",
+            "speech.segment",
+            "permission.recorded",
+            "tool.requested",
+            "tool.completed",
+            "tool.response_unknown",
+            "booking.committed",
+            "confirmation.recorded",
+            "confirmation.failed",
+            "interruption.started",
+            "playback.stopped",
+            "run.ended"
+          ]
+        },
+        "source": {
+          "enum": [
+            "harness",
+            "adapter",
+            "sandbox",
+            "reviewer"
+          ]
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {},
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "event_id",
+        "run_id",
+        "journey_id",
+        "sequence",
+        "at_ms",
+        "type",
+        "source",
+        "operation_id",
+        "payload",
+        "extensions"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "run.started"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "execution_mode": {
+                    "enum": [
+                      "reference",
+                      "text",
+                      "audio"
+                    ]
+                  }
+                },
+                "required": [
+                  "execution_mode"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "caller.turn_started"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "turn_id": {
+                    "$ref": "#/$defs/id"
+                  }
+                },
+                "required": [
+                  "turn_id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "caller.turn_completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "turn_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  }
+                },
+                "required": [
+                  "turn_id",
+                  "text"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "speech.segment"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "segment_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "speaker": {
+                    "enum": [
+                      "caller",
+                      "assistant"
+                    ]
+                  },
+                  "start_ms": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 90000
+                  },
+                  "end_ms": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 90000
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  "transcript_origin": {
+                    "enum": [
+                      "runtime",
+                      "independent_transcription",
+                      "scripted_reference",
+                      "manual"
+                    ]
+                  }
+                },
+                "required": [
+                  "segment_id",
+                  "speaker",
+                  "start_ms",
+                  "end_ms",
+                  "text",
+                  "transcript_origin"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "permission.recorded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "permission_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "caller_turn_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "slot_id": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/id"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "booking": {
+                    "type": "boolean"
+                  },
+                  "confirmation": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "permission_id",
+                  "caller_turn_id",
+                  "slot_id",
+                  "booking",
+                  "confirmation"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tool.requested"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "lookup_slots"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "args": {
+                        "type": "object",
+                        "properties": {
+                          "slot_id": {
+                            "$ref": "#/$defs/id"
+                          }
+                        },
+                        "required": [
+                          "slot_id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "args"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "create_booking"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "args": {
+                        "type": "object",
+                        "properties": {
+                          "reservation_id": {
+                            "$ref": "#/$defs/id"
+                          },
+                          "caller_name": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "service": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "idempotency_key": {
+                            "$ref": "#/$defs/id"
+                          }
+                        },
+                        "required": [
+                          "reservation_id",
+                          "caller_name",
+                          "service",
+                          "idempotency_key"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "args"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "get_booking_status"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "args": {
+                        "type": "object",
+                        "properties": {
+                          "reservation_id": {
+                            "$ref": "#/$defs/id"
+                          }
+                        },
+                        "required": [
+                          "reservation_id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "args"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "record_confirmation"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "args": {
+                        "type": "object",
+                        "properties": {
+                          "booking_id": {
+                            "$ref": "#/$defs/id"
+                          },
+                          "idempotency_key": {
+                            "$ref": "#/$defs/id"
+                          }
+                        },
+                        "required": [
+                          "booking_id",
+                          "idempotency_key"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "args"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tool.completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "lookup_slots"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "response": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "available"
+                              },
+                              "reservation_id": {
+                                "$ref": "#/$defs/id"
+                              },
+                              "slot_id": {
+                                "$ref": "#/$defs/id"
+                              },
+                              "starts_at": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "reservation_id",
+                              "slot_id",
+                              "starts_at"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "enum": [
+                                  "unavailable",
+                                  "failed"
+                                ]
+                              },
+                              "code": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "code"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "response"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "create_booking"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "response": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "confirmed"
+                              },
+                              "booking_id": {
+                                "$ref": "#/$defs/id"
+                              },
+                              "slot_id": {
+                                "$ref": "#/$defs/id"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "booking_id",
+                              "slot_id"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "enum": [
+                                  "failed",
+                                  "rejected"
+                                ]
+                              },
+                              "code": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "code"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "response"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "get_booking_status"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "response": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "confirmed"
+                              },
+                              "booking_id": {
+                                "$ref": "#/$defs/id"
+                              },
+                              "slot_id": {
+                                "$ref": "#/$defs/id"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "booking_id",
+                              "slot_id"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "not_found"
+                              }
+                            },
+                            "required": [
+                              "status"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "failed"
+                              },
+                              "code": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "code"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "response"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tool": {
+                        "const": "record_confirmation"
+                      },
+                      "call_id": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "response": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "const": "recorded"
+                              },
+                              "confirmation_id": {
+                                "$ref": "#/$defs/id"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "confirmation_id"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "enum": [
+                                  "failed",
+                                  "pending"
+                                ]
+                              },
+                              "code": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "code"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tool",
+                      "call_id",
+                      "response"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tool.response_unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "tool": {
+                    "enum": [
+                      "lookup_slots",
+                      "create_booking",
+                      "get_booking_status",
+                      "record_confirmation"
+                    ]
+                  },
+                  "call_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "tool",
+                  "call_id",
+                  "code"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "booking.committed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "booking_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "reservation_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "slot_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "state_revision": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  }
+                },
+                "required": [
+                  "booking_id",
+                  "reservation_id",
+                  "slot_id",
+                  "state_revision"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "confirmation.recorded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "confirmation_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "booking_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "state_revision": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  }
+                },
+                "required": [
+                  "confirmation_id",
+                  "booking_id",
+                  "state_revision"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "confirmation.failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "booking_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "state_revision": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  }
+                },
+                "required": [
+                  "booking_id",
+                  "code",
+                  "state_revision"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "interruption.started"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "caller_turn_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "planned": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "caller_turn_id",
+                  "planned"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "playback.stopped"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "segment_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "runtime_interruption_event": {
+                    "$ref": "#/$defs/id"
+                  }
+                },
+                "required": [
+                  "segment_id",
+                  "runtime_interruption_event"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "run.ended"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "completion": {
+                    "enum": [
+                      "completed",
+                      "failed",
+                      "interrupted",
+                      "unknown"
+                    ]
+                  }
+                },
+                "required": [
+                  "completion"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "permission": {
+      "type": "object",
+      "properties": {
+        "permission_id": {
+          "$ref": "#/$defs/id"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "caller_turn_id": {
+          "$ref": "#/$defs/id"
+        },
+        "slot_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "booking": {
+          "type": "boolean"
+        },
+        "confirmation": {
+          "type": "boolean"
+        },
+        "recorded_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 90000
+        }
+      },
+      "required": [
+        "permission_id",
+        "run_id",
+        "caller_turn_id",
+        "slot_id",
+        "booking",
+        "confirmation",
+        "recorded_at_ms"
+      ],
+      "additionalProperties": false
+    },
+    "reservation": {
+      "type": "object",
+      "properties": {
+        "reservation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "slot_id": {
+          "$ref": "#/$defs/id"
+        },
+        "starts_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "service": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "reservation_id",
+        "run_id",
+        "slot_id",
+        "starts_at",
+        "service",
+        "operation_id"
+      ],
+      "additionalProperties": false
+    },
+    "booking": {
+      "type": "object",
+      "properties": {
+        "booking_id": {
+          "$ref": "#/$defs/id"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "reservation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "slot_id": {
+          "$ref": "#/$defs/id"
+        },
+        "caller_name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "service": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state_revision": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "booking_id",
+        "run_id",
+        "reservation_id",
+        "slot_id",
+        "caller_name",
+        "service",
+        "operation_id",
+        "state_revision"
+      ],
+      "additionalProperties": false
+    },
+    "confirmation": {
+      "type": "object",
+      "properties": {
+        "confirmation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "booking_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "recorded",
+            "failed",
+            "pending"
+          ]
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state_revision": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "confirmation_id",
+        "run_id",
+        "booking_id",
+        "status",
+        "operation_id",
+        "state_revision"
+      ],
+      "additionalProperties": false
+    },
+    "attempt": {
+      "type": "object",
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 90000
+        },
+        "tool": {
+          "enum": [
+            "lookup_slots",
+            "create_booking",
+            "get_booking_status",
+            "record_confirmation"
+          ]
+        },
+        "call_id": {
+          "$ref": "#/$defs/id"
+        },
+        "args_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "idempotency_key": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "disposition": {
+          "enum": [
+            "accepted",
+            "denied",
+            "deduplicated",
+            "failed",
+            "response_unknown",
+            "pending"
+          ]
+        },
+        "operation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state_revision": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fault_code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sequence",
+        "at_ms",
+        "tool",
+        "call_id",
+        "args_sha256",
+        "idempotency_key",
+        "disposition",
+        "operation_id",
+        "state_revision",
+        "fault_code"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "state"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "journey_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state_revision": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closed": {
+          "type": "boolean"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/permission"
+          },
+          "minItems": 0,
+          "maxItems": 12
+        },
+        "reservations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reservation"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "bookings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/booking"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "confirmations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/confirmation"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "attempts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attempt"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        },
+        "audit_completeness": {
+          "enum": [
+            "complete",
+            "legacy_incomplete"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "run_id",
+        "journey_id",
+        "state_revision",
+        "closed",
+        "permissions",
+        "reservations",
+        "bookings",
+        "confirmations",
+        "attempts",
+        "extensions"
+      ],
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/$defs/id"
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "artifact_kind": {
+          "enum": [
+            "scenario",
+            "configuration",
+            "events",
+            "state",
+            "audio",
+            "measurement",
+            "audio_caller",
+            "audio_assistant"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 104857600
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "path",
+        "artifact_kind",
+        "bytes",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "identities": {
+      "type": "object",
+      "properties": {
+        "scenario": {
+          "$ref": "#/$defs/sha256"
+        },
+        "suite": {
+          "$ref": "#/$defs/sha256"
+        },
+        "configuration": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/sha256"
+        },
+        "evaluator": {
+          "$ref": "#/$defs/sha256"
+        },
+        "conditions": {
+          "$ref": "#/$defs/sha256"
+        },
+        "policy": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "scenario",
+        "suite",
+        "configuration",
+        "sandbox",
+        "evaluator",
+        "conditions",
+        "policy"
+      ],
+      "additionalProperties": false
+    },
+    "cost_component": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "enum": [
+            "runtime",
+            "caller_synthesis",
+            "judge",
+            "other"
+          ]
+        },
+        "observed_usd": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "component",
+        "observed_usd",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "cost": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cost_component"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "total_observed_usd": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "completeness",
+        "components",
+        "total_observed_usd"
+      ],
+      "additionalProperties": false
+    },
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "manifest"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "journey_id": {
+          "$ref": "#/$defs/id"
+        },
+        "scenario_id": {
+          "$ref": "#/$defs/id"
+        },
+        "execution_mode": {
+          "enum": [
+            "reference",
+            "text",
+            "audio"
+          ]
+        },
+        "evidence_origin": {
+          "enum": [
+            "scripted_reference",
+            "private_lab_export",
+            "external_self_attested"
+          ]
+        },
+        "candidate_id": {
+          "$ref": "#/$defs/id"
+        },
+        "identities": {
+          "$ref": "#/$defs/identities"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "started_at": {
+          "$ref": "#/$defs/utc"
+        },
+        "ended_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/utc"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "completion": {
+          "enum": [
+            "completed",
+            "failed",
+            "interrupted",
+            "unknown"
+          ]
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "minItems": 4,
+          "maxItems": 100
+        },
+        "cost": {
+          "$ref": "#/$defs/cost"
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "run_id",
+        "journey_id",
+        "scenario_id",
+        "execution_mode",
+        "evidence_origin",
+        "candidate_id",
+        "identities",
+        "seed",
+        "started_at",
+        "ended_at",
+        "completion",
+        "artifacts",
+        "cost",
+        "extensions"
+      ],
+      "additionalProperties": false
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "review"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "review_id": {
+          "$ref": "#/$defs/id"
+        },
+        "review_kind": {
+          "enum": [
+            "human",
+            "example"
+          ]
+        },
+        "reviewer_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "completed"
+          ]
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/utc"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_ref"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "final_status_truthful": {
+          "$ref": "#/$defs/verdict"
+        },
+        "next_step_clear": {
+          "$ref": "#/$defs/verdict"
+        },
+        "ratings": {
+          "type": "object",
+          "properties": {
+            "intelligibility": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "naturalness": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "entity_accuracy": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "turn_taking": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "intelligibility",
+            "naturalness",
+            "entity_accuracy",
+            "turn_taking"
+          ],
+          "additionalProperties": false
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        },
+        "resolves_review_sha256": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sha256"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "review_id",
+        "review_kind",
+        "reviewer_id",
+        "status",
+        "completed_at",
+        "run_id",
+        "manifest_sha256",
+        "evidence",
+        "final_status_truthful",
+        "next_step_clear",
+        "ratings",
+        "notes",
+        "extensions"
+      ],
+      "additionalProperties": false
+    },
+    "check": {
+      "type": "object",
+      "properties": {
+        "check_id": {
+          "enum": [
+            "booking_count",
+            "booking_slot",
+            "booking_intake",
+            "booking_authorized",
+            "booking_attempt_limit",
+            "confirmation_count",
+            "confirmation_authorized",
+            "returned_ids_and_order",
+            "read_after_unknown_before_confirmation",
+            "no_write_attempts",
+            "fault_exercised",
+            "final_status_truthful",
+            "confirmation_attempt_limit"
+          ]
+        },
+        "critical": {
+          "type": "boolean"
+        },
+        "verdict": {
+          "$ref": "#/$defs/verdict"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_ref"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "check_id",
+        "critical",
+        "verdict",
+        "reason",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "metric": {
+      "type": "object",
+      "properties": {
+        "metric_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "enum": [
+            "ms",
+            "count",
+            "rating",
+            "usd"
+          ]
+        },
+        "method_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "distribution": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "max": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "p95": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "p95_note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 256
+                }
+              },
+              "required": [
+                "n",
+                "median",
+                "max",
+                "p95",
+                "p95_note"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "metric_id",
+        "value",
+        "unit",
+        "method_id",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "result"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "run_id": {
+          "$ref": "#/$defs/id"
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "business_outcome": {
+          "$ref": "#/$defs/outcome"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          },
+          "minItems": 1,
+          "maxItems": 32
+        },
+        "dimensions": {
+          "type": "object",
+          "properties": {
+            "evidence": {
+              "$ref": "#/$defs/verdict"
+            },
+            "functional": {
+              "$ref": "#/$defs/verdict"
+            },
+            "truthfulness": {
+              "$ref": "#/$defs/verdict"
+            },
+            "timing": {
+              "$ref": "#/$defs/verdict"
+            },
+            "listening": {
+              "$ref": "#/$defs/verdict"
+            },
+            "repeatability": {
+              "$ref": "#/$defs/verdict"
+            },
+            "release_readiness": {
+              "$ref": "#/$defs/verdict"
+            }
+          },
+          "required": [
+            "evidence",
+            "functional",
+            "truthfulness",
+            "timing",
+            "listening",
+            "repeatability",
+            "release_readiness"
+          ],
+          "additionalProperties": false
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/metric"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "cost": {
+          "$ref": "#/$defs/cost"
+        },
+        "review_sha256": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sha256"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        },
+        "evaluator_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "policy_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "assessment_scope": {
+          "enum": [
+            "functional",
+            "audio-release"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "run_id",
+        "manifest_sha256",
+        "business_outcome",
+        "checks",
+        "dimensions",
+        "metrics",
+        "cost",
+        "review_sha256",
+        "blockers",
+        "extensions"
+      ],
+      "additionalProperties": false
+    },
+    "comparison_row": {
+      "type": "object",
+      "properties": {
+        "scenario_id": {
+          "$ref": "#/$defs/id"
+        },
+        "comparability": {
+          "enum": [
+            "comparable",
+            "incomparable",
+            "insufficient"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "baseline_runs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "candidate_runs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "baseline_critical_failures": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "candidate_critical_failures": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "deltas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/metric"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "baseline_summary": {
+          "$ref": "#/$defs/arm_summary"
+        },
+        "candidate_summary": {
+          "$ref": "#/$defs/arm_summary"
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "outcome_gap": {
+              "$ref": "#/$defs/timing_summary"
+            },
+            "interruption_cutoff": {
+              "$ref": "#/$defs/timing_summary"
+            },
+            "unplanned_overlap": {
+              "$ref": "#/$defs/timing_summary"
+            }
+          },
+          "required": [
+            "outcome_gap",
+            "interruption_cutoff",
+            "unplanned_overlap"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "scenario_id",
+        "comparability",
+        "reason",
+        "baseline_runs",
+        "candidate_runs",
+        "baseline_critical_failures",
+        "candidate_critical_failures",
+        "deltas"
+      ],
+      "additionalProperties": false
+    },
+    "comparison": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "comparison"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "comparison_id": {
+          "$ref": "#/$defs/id"
+        },
+        "declared_change": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "scope": {
+          "enum": [
+            "functional",
+            "audio-release"
+          ]
+        },
+        "assessment": {
+          "enum": [
+            "blocked",
+            "insufficient_evidence",
+            "eligible_for_review"
+          ]
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/comparison_row"
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "comparison_id",
+        "declared_change",
+        "scope",
+        "assessment",
+        "rows",
+        "blockers",
+        "extensions"
+      ],
+      "additionalProperties": false
+    },
+    "tool_request": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "const": "lookup_slots"
+            },
+            "call_id": {
+              "$ref": "#/$defs/id"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "slot_id": {
+                  "$ref": "#/$defs/id"
+                }
+              },
+              "required": [
+                "slot_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "tool",
+            "call_id",
+            "args"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "const": "create_booking"
+            },
+            "call_id": {
+              "$ref": "#/$defs/id"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "reservation_id": {
+                  "$ref": "#/$defs/id"
+                },
+                "caller_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "service": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "idempotency_key": {
+                  "$ref": "#/$defs/id"
+                }
+              },
+              "required": [
+                "reservation_id",
+                "caller_name",
+                "service",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "tool",
+            "call_id",
+            "args"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "const": "get_booking_status"
+            },
+            "call_id": {
+              "$ref": "#/$defs/id"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "reservation_id": {
+                  "$ref": "#/$defs/id"
+                }
+              },
+              "required": [
+                "reservation_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "tool",
+            "call_id",
+            "args"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "const": "record_confirmation"
+            },
+            "call_id": {
+              "$ref": "#/$defs/id"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "booking_id": {
+                  "$ref": "#/$defs/id"
+                },
+                "idempotency_key": {
+                  "$ref": "#/$defs/id"
+                }
+              },
+              "required": [
+                "booking_id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "tool",
+            "call_id",
+            "args"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "run_list": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "run_list"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "minItems": 1,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "paths"
+      ],
+      "additionalProperties": false
+    },
+    "review_list": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "review_list"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "minItems": 1,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "paths"
+      ],
+      "additionalProperties": false
+    },
+    "arm_summary": {
+      "type": "object",
+      "properties": {
+        "attempts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "functional_passes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknowns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reviewed_runs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "known_observed_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "cost_complete": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "attempts",
+        "completed",
+        "functional_passes",
+        "unknowns",
+        "reviewed_runs",
+        "known_observed_usd",
+        "cost_complete"
+      ]
+    },
+    "timing_summary": {
+      "type": "object",
+      "properties": {
+        "baseline": {
+          "type": "object",
+          "properties": {
+            "n": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "median": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "max": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "p95": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "p95_note": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "n",
+            "median",
+            "max",
+            "p95",
+            "p95_note"
+          ],
+          "additionalProperties": false
+        },
+        "candidate": {
+          "type": "object",
+          "properties": {
+            "n": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "median": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "max": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "p95": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "p95_note": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "n",
+            "median",
+            "max",
+            "p95",
+            "p95_note"
+          ],
+          "additionalProperties": false
+        },
+        "median_delta": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "baseline",
+        "candidate",
+        "median_delta"
+      ],
+      "additionalProperties": false
+    },
+    "measurement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "measurement"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "method_id": {
+          "const": "pcm-rms-v1"
+        },
+        "audio_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "channel_layout": {
+          "enum": [
+            "caller-left-assistant-right",
+            "unknown"
+          ]
+        },
+        "alignment_error_ms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "alignment_source": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 4096
+        },
+        "extensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+            "not": {
+              "pattern": "[^a-z0-9_:-]"
+            }
+          }
+        },
+        "derivatives": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "properties": {
+              "artifact_id": {
+                "$ref": "#/$defs/id"
+              },
+              "source_audio_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "channel": {
+                "enum": [
+                  "caller",
+                  "assistant"
+                ]
+              }
+            },
+            "required": [
+              "artifact_id",
+              "source_audio_sha256",
+              "sha256",
+              "channel"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "schema_version",
+        "method_id",
+        "audio_sha256",
+        "channel_layout",
+        "alignment_error_ms",
+        "alignment_source",
+        "extensions"
+      ]
+    },
+    "suite": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "suite"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "suite_id": {
+          "$ref": "#/$defs/id"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scenarios": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenario_id": {
+                "$ref": "#/$defs/id"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            },
+            "required": [
+              "scenario_id",
+              "revision",
+              "sha256"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "extensions": {
+          "type": "object",
+          "maxProperties": 0
+        }
+      },
+      "required": [
+        "kind",
+        "schema_version",
+        "suite_id",
+        "revision",
+        "scenarios",
+        "extensions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/scenario"
+    },
+    {
+      "$ref": "#/$defs/configuration"
+    },
+    {
+      "$ref": "#/$defs/event"
+    },
+    {
+      "$ref": "#/$defs/state"
+    },
+    {
+      "$ref": "#/$defs/manifest"
+    },
+    {
+      "$ref": "#/$defs/review"
+    },
+    {
+      "$ref": "#/$defs/result"
+    },
+    {
+      "$ref": "#/$defs/comparison"
+    },
+    {
+      "$ref": "#/$defs/run_list"
+    },
+    {
+      "$ref": "#/$defs/review_list"
+    },
+    {
+      "$ref": "#/$defs/measurement"
+    },
+    {
+      "$ref": "#/$defs/suite"
+    }
+  ]
+}
