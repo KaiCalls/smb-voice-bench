@@ -47,6 +47,10 @@ class BundleWriter(unittest.TestCase):
                 tool='get_booking_status', call_id='reconcile', args={'reservation_id': reservation}))
             handle.execute(handle.capability, 'confirm', dict(tool='record_confirmation', call_id='confirm',
                 args={'booking_id': response['booking_id'], 'idempotency_key': 'one_confirmation'}))
+        if not interrupted and not denied:
+            for turn in scenario['caller_turns'][2:]:
+                handle.emit('caller.turn_started', {'turn_id': turn['turn_id']})
+                handle.emit('caller.turn_completed', {'turn_id': turn['turn_id'], 'text': turn['text']})
         at = handle.events()[-1]['at_ms'] + 1
         handle.emit('speech.segment', dict(segment_id='outcome', speaker='assistant', start_ms=at, end_ms=at,
             text='Toy unit-test capture, no live agent or speech-quality claim.', transcript_origin='manual'), source='adapter')
@@ -153,6 +157,24 @@ class BundleWriter(unittest.TestCase):
         self.assertEqual(evaluate(bundle)['dimensions']['functional'], 'unknown')
         capture['cost']['completeness'] = 'complete'
         with self.assertRaises(Invalid): write_external_bundle(self.root / 'false_complete', **capture)
+
+    def test_truncated_script_is_unknown_and_changed_script_is_invalid(self):
+        capture = self.capture()
+        last_turn = capture['scenario']['caller_turns'][-1]['turn_id']
+        truncated = copy.deepcopy(capture)
+        truncated['events'] = [e for e in truncated['events'] if not (
+            e['type'] in ('caller.turn_started', 'caller.turn_completed') and e['payload']['turn_id'] == last_turn)]
+        write_external_bundle(self.root / 'truncated', **truncated)
+        bundle = read_bundle(self.root / 'truncated')
+        self.assertIn('caller script incomplete', bundle.missing)
+        self.assertEqual(evaluate(bundle)['dimensions']['functional'], 'unknown')
+        changed = copy.deepcopy(capture)
+        next(e for e in changed['events'] if e['type'] == 'caller.turn_completed')['payload']['text'] = 'Changed caller text'
+        with self.assertRaises(Invalid): write_external_bundle(self.root / 'changed', **changed)
+        reordered = copy.deepcopy(capture)
+        turns = [e for e in reordered['events'] if e['type'] == 'caller.turn_completed']
+        turns[0]['payload'], turns[1]['payload'] = turns[1]['payload'], turns[0]['payload']
+        with self.assertRaises(Invalid): write_external_bundle(self.root / 'reordered', **reordered)
 
     def test_bounds_audio_binding_and_output_safety(self):
         capture = self.capture(mode='audio')
