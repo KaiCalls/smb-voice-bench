@@ -24,6 +24,7 @@ def read_bundle(root):
     manifest_raw=read_bytes(root,'manifest.json')
     manifest=validate(parse(manifest_raw),'manifest')
     missing=[]; artifacts={}; ids=set(); paths=set(); kinds=set(); total=len(manifest_raw)
+    if manifest['ended_at'] is None:missing.append('run end time unavailable')
     for item in manifest['artifacts']:
         aid=item['artifact_id']; kind=item['artifact_kind']; name=item['path']
         if aid in ids or name in paths or kind in kinds and kind in ('scenario','configuration','events','state','audio','audio_caller','audio_assistant'):
@@ -91,6 +92,12 @@ def read_bundle(root):
             if e['operation_id'] in seen_ops and seen_ops[e['operation_id']]!=request['call_id']: raise Invalid('operation reused with another call ID')
             seen_calls[request['call_id']]=signature; seen_ops[e['operation_id']]=request['call_id']; requests.append(e)
         if e['type'] in ('tool.completed','tool.response_unknown'): replies.append(e)
+    if scenario:
+        expected_turns=[{'turn_id':turn['turn_id'],'text':turn['text']} for turn in required['caller_turns']]
+        completed_turns=[e['payload'] for e in events if e['type']=='caller.turn_completed']
+        if completed_turns!=expected_turns[:len(completed_turns)]:
+            raise Invalid('captured caller script differs from installed fixture')
+        if len(completed_turns)<len(expected_turns):missing.append('caller script incomplete')
     if not events or events[0]['type']!='run.started': missing.append('run start unavailable')
     if not events or events[-1]['type']!='run.ended': missing.append('terminal receipt unavailable')
     unmatched=requests.copy()
