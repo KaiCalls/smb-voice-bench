@@ -1,0 +1,12 @@
+include LICENSE README.md CONTRIBUTING.md SECURITY.md CHANGELOG.md THIRD_PARTY_NOTICES.md
+include requirements.in requirements.lock PUBLIC_FILES.txt
+recursive-include docs *.md
+recursive-include tests *.py
+recursive-include examples *.py
+recursive-include tools *.py *.cjs
+include .gitignore
+include .github/workflows/ci.yml
+recursive-include src/smb_voice_bench *.py *.json *.js *.css
+exclude src/smb_voice_bench.egg-info/*
+global-exclude *.py[cod]
+include requirements-dev.in requirements-dev.lock

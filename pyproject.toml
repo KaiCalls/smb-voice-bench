@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smb-voice-bench"
+version = "0.1.0"
+description = "Offline evidence checks for synthetic AI receptionist booking workflows"
+requires-python = ">=3.10"
+readme = "README.md"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+license = "MIT"
+dependencies = ["jsonschema==4.25.1"]
+
+[project.urls]
+Repository = "https://github.com/KaiCalls/smb-voice-bench"
+Issues = "https://github.com/KaiCalls/smb-voice-bench/issues"
+
+[project.scripts]
+smb-voice-bench = "smb_voice_bench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+smb_voice_bench = ["schemas/*.json", "scenarios/booking/*.json", "scenarios/*.json", "assets/*"]

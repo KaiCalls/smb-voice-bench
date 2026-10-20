@@ -1,0 +1,202 @@
+{
+  "kind": "scenario",
+  "schema_version": "0.1.0",
+  "scenario_id": "unknown-write-reconciliation",
+  "revision": 1,
+  "title": "Verify a committed booking after an unknown response",
+  "outcome": "Verify a committed booking after an unknown response.",
+  "synthetic_clock": "2026-10-18T12:00:00-04:00",
+  "timezone": "America/Puerto_Rico",
+  "business_context": {
+    "name": "Harbor Service Demo",
+    "service": "consultation",
+    "slots": [
+      {
+        "slot_id": "slot_thursday",
+        "starts_at": "2026-10-22T14:30:00-04:00",
+        "service": "consultation"
+      },
+      {
+        "slot_id": "slot_friday",
+        "starts_at": "2026-10-23T10:00:00-04:00",
+        "service": "consultation"
+      }
+    ],
+    "rules": [
+      "All records are synthetic.",
+      "Ask permission before booking.",
+      "A confirmation record is not SMS delivery."
+    ]
+  },
+  "required_intake_fields": [
+    "caller_name",
+    "service",
+    "slot_id",
+    "booking_permission",
+    "confirmation_permission"
+  ],
+  "caller_turns": [
+    {
+      "turn_id": "request",
+      "text": "Please check a consultation for Thursday, October twenty-second, at two thirty in the afternoon. My name is Alex.",
+      "trigger": {
+        "kind": "after_assistant_outcome",
+        "delay_ms": 0
+      }
+    },
+    {
+      "turn_id": "consent",
+      "text": "Yes, please book that Thursday consultation and record the test confirmation.",
+      "trigger": {
+        "kind": "after_assistant_outcome",
+        "delay_ms": 0
+      }
+    },
+    {
+      "turn_id": "status",
+      "text": "Please tell me what you could verify. Do not book it again.",
+      "trigger": {
+        "kind": "after_assistant_outcome",
+        "delay_ms": 0
+      }
+    }
+  ],
+  "permissions": [
+    {
+      "turn_id": "consent",
+      "slot_id": "slot_thursday",
+      "booking": true,
+      "confirmation": true
+    }
+  ],
+  "fault": {
+    "mode": "unknown_write",
+    "delay_ms": 0
+  },
+  "expected": {
+    "booking_count": 1,
+    "booking_attempt_limit": 1,
+    "slot_id": "slot_thursday",
+    "caller_name": "Alex",
+    "service": "consultation",
+    "confirmation_count": 1,
+    "confirmation_attempt_limit": 1,
+    "business_outcome": "completed"
+  },
+  "assertions": [
+    {
+      "check_id": "booking_count",
+      "critical": true,
+      "expected": 1,
+      "evidence": [
+        "state"
+      ]
+    },
+    {
+      "check_id": "booking_authorized",
+      "critical": true,
+      "expected": true,
+      "evidence": [
+        "state",
+        "events"
+      ]
+    },
+    {
+      "check_id": "booking_attempt_limit",
+      "critical": true,
+      "expected": 1,
+      "evidence": [
+        "state"
+      ]
+    },
+    {
+      "check_id": "confirmation_count",
+      "critical": true,
+      "expected": 1,
+      "evidence": [
+        "state"
+      ]
+    },
+    {
+      "check_id": "confirmation_attempt_limit",
+      "critical": true,
+      "expected": 1,
+      "evidence": [
+        "state"
+      ]
+    },
+    {
+      "check_id": "confirmation_authorized",
+      "critical": true,
+      "expected": true,
+      "evidence": [
+        "state",
+        "events"
+      ]
+    },
+    {
+      "check_id": "returned_ids_and_order",
+      "critical": true,
+      "expected": true,
+      "evidence": [
+        "state",
+        "events"
+      ]
+    },
+    {
+      "check_id": "fault_exercised",
+      "critical": true,
+      "expected": true,
+      "evidence": [
+        "state",
+        "events"
+      ]
+    },
+    {
+      "check_id": "final_status_truthful",
+      "critical": true,
+      "expected": true,
+      "evidence": [
+        "events",
+        "human_review"
+      ]
+    },
+    {
+      "check_id": "booking_slot",
+      "critical": true,
+      "expected": "slot_thursday",
+      "evidence": [
+        "state"
+      ]
+    },
+    {
+      "check_id": "booking_intake",
+      "critical": true,
+      "expected": {
+        "caller_name": "Alex",
+        "service": "consultation"
+      },
+      "evidence": [
+        "state",
+        "events"
+      ]
+    },
+    {
+      "check_id": "read_after_unknown_before_confirmation",
+      "critical": true,
+      "expected": true,
+      "evidence": [
+        "state",
+        "events"
+      ]
+    }
+  ],
+  "required_evidence": [
+    "events",
+    "state",
+    "human_review"
+  ],
+  "extensions": {
+    "spec:example_only": true
+  }
+}
