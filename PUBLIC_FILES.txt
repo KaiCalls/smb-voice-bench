@@ -8,6 +8,7 @@ PUBLIC_FILES.txt
 README.md
 SECURITY.md
 THIRD_PARTY_NOTICES.md
+docs/ACCEPTANCE.md
 docs/CONTRACTS.md
 docs/INTEGRATION.md
 docs/METHODS.md
@@ -58,3 +59,4 @@ tools/browser_qa.cjs
 tools/check_public.py
 tools/make_viewer_fixtures.py
 tools/scenario_matrix.py
+tools/verify_install.py

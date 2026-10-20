@@ -67,6 +67,10 @@ Use personal or synthetic local audio only. Original media stays immutable; norm
 
 Functional, evidence, truthfulness, timing, listening and repeatability are separate verdicts. `audio-release` additionally requires all seven scenarios, five completed observations per unchanged configuration, actual media, two completed human reviews per run and the timing policy. A single-run audio assessment cannot satisfy repeatability. Any selected critical failure blocks either scope, even if the sandbox prevented the action. Eligibility is permission to review lab evidence, never permission to deploy.
 
+## Implementation acceptance
+
+The offline v0.1 implementation is complete for the seven-scenario scope. See [acceptance evidence and reproduction](docs/ACCEPTANCE.md). To exercise every installed command, run `python /absolute/checkout/tools/verify_install.py --output ./acceptance-report` from a separate temporary directory with `PYTHONPATH` unset. This checks actual installed code, reference outcomes, imports, report regeneration and failure paths without network or credentials. Package publication and independent-person quickstart review remain separate.
+
 ## Develop and contribute
 
 Run one package-local process: `python -m unittest discover -s tests -v`. No monorepo build or live call is needed. [CONTRIBUTING](CONTRIBUTING.md) describes synthetic case changes and negative controls. [Methods](docs/METHODS.md) defines metrics and limitations. [Release review](docs/RELEASE.md) lists remaining human/release gates. Code, synthetic fixtures and documentation use MIT; see [provenance](THIRD_PARTY_NOTICES.md).
