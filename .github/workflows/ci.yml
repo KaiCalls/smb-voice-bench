@@ -34,6 +34,4 @@ jobs:
       - name: Installed CLI outside checkout
         working-directory: ${{ runner.temp }}
         run: |
-          "$RUNNER_TEMP/wheel-env/bin/smb-voice-bench" doctor --json
-          "$RUNNER_TEMP/wheel-env/bin/smb-voice-bench" catalog --json
-          "$RUNNER_TEMP/wheel-env/bin/smb-voice-bench" demo --output ./demo-report --json
+          "$RUNNER_TEMP/wheel-env/bin/python" "$GITHUB_WORKSPACE/tools/verify_install.py" --output ./acceptance-report

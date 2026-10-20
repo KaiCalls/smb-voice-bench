@@ -1,6 +1,6 @@
 # Proposed v0.1.0 release — not published
 
-Source: `KaiCalls/smb-voice-bench`. This standalone draft preserves the historical fixture pack and proposes the Python toolkit at the repository root. Repository review does not publish a package or approve a release. The private integration bridge is excluded from this repository.
+Source: `KaiCalls/smb-voice-bench`. The merged source preserves the historical fixture pack and contains the Python toolkit at the repository root; implementation acceptance is recorded in docs/ACCEPTANCE.md. Repository review does not publish a package or approve a release. The private integration bridge is excluded from this repository.
 
 ## Review gates
 
