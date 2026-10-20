@@ -24,6 +24,7 @@ src/smb_voice_bench/__init__.py
 src/smb_voice_bench/__main__.py
 src/smb_voice_bench/assets/viewer.css
 src/smb_voice_bench/assets/viewer.js
+src/smb_voice_bench/bundle_writer.py
 src/smb_voice_bench/canonical.py
 src/smb_voice_bench/cli.py
 src/smb_voice_bench/compare.py
@@ -46,6 +47,7 @@ src/smb_voice_bench/scenarios/booking/unknown-write-reconciliation.json
 src/smb_voice_bench/scenarios/suite.json
 src/smb_voice_bench/schemas/contracts.schema.json
 tests/test_audio_reviews.py
+tests/test_bundle_writer.py
 tests/test_cli.py
 tests/test_contracts.py
 tests/test_evidence.py

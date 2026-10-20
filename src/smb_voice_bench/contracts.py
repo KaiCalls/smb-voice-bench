@@ -57,12 +57,12 @@ def validate(value, kind=None):
                 relative(path)
         if kind == 'manifest':
             import math
-            costs=value['cost'];total=costs['total_observed_usd'];observed=sum(x['observed_usd'] for x in costs['components'])
+            costs=value['cost'];total=costs['total_observed_usd'];observed=sum(x['observed_usd'] for x in costs['components'] if x['observed_usd'] is not None)
             if total is not None and not math.isclose(total,observed,abs_tol=1e-9): raise Invalid('cost total differs from observed components')
-            if costs['completeness']=='complete' and total is None: raise Invalid('complete costs require a known total')
+            if costs['completeness']=='complete' and (total is None or any(x['observed_usd'] is None for x in costs['components'])): raise Invalid('complete costs require known components and total')
             if costs['completeness']=='not_applicable' and (costs['components'] or total is not None): raise Invalid('inapplicable costs cannot contain charges')
         if kind == "manifest":
-            if timestamp_key(value["ended_at"]) < timestamp_key(value["started_at"]):
+            if value["ended_at"] is not None and timestamp_key(value["ended_at"]) < timestamp_key(value["started_at"]):
                 raise Invalid("run end precedes start")
             for artifact in value["artifacts"]:
                 validate(artifact, "artifact")

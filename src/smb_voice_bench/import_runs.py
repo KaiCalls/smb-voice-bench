@@ -24,6 +24,7 @@ def read_bundle(root):
     manifest_raw=read_bytes(root,'manifest.json')
     manifest=validate(parse(manifest_raw),'manifest')
     missing=[]; artifacts={}; ids=set(); paths=set(); kinds=set(); total=len(manifest_raw)
+    if manifest['ended_at'] is None:missing.append('run end time unavailable')
     for item in manifest['artifacts']:
         aid=item['artifact_id']; kind=item['artifact_kind']; name=item['path']
         if aid in ids or name in paths or kind in kinds and kind in ('scenario','configuration','events','state','audio','audio_caller','audio_assistant'):
