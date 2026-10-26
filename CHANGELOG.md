@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+`grade` command: an A to F letter over the seven cases from captured bundles (`--input`) or a scripted reference (`--agent`), written as `grade.json`, `GRADE.md` and `badge.svg`. Three mandatory cases cap the grade at D, unknown evidence never passes, and a missing case gives no letter. `--min-grade` gates CI. The repository is now a Claude Code plugin marketplace with a `smb-voice-bench` skill, and the README documents a one-line `uvx` install from git.
+
 ## 0.1.0 — 2026-10-20
 
 External capture export: `write_external_bundle` builds manifests from bounded snapshots, retains original audio and explicit conditions, validates cross-file consistency before atomic publication, and rejects reference relabeling. Truncated caller scripts remain incomplete; changed or reordered turns are rejected. Unknown end times and nullable partial costs now remain incomplete instead of failing during parsing.

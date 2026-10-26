@@ -1,0 +1,12 @@
+{
+  "name": "smb-voice-bench",
+  "version": "0.1.0",
+  "description": "Grade an AI receptionist A to F on seven offline booking cases.",
+  "author": {
+    "name": "KaiCalls",
+    "url": "https://github.com/KaiCalls"
+  },
+  "homepage": "https://github.com/KaiCalls/smb-voice-bench",
+  "repository": "https://github.com/KaiCalls/smb-voice-bench",
+  "license": "MIT"
+}

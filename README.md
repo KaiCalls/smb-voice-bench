@@ -8,6 +8,33 @@ This local Python toolkit checks caller-authorized business outcomes against syn
 
 The original JavaScript fixture pack is preserved in [legacy/fixture-pack-v1](legacy/fixture-pack-v1/README.md). Its 25 fixtures and npm version are separate from this seven-scenario Python draft; see [migration notes](docs/MIGRATION.md).
 
+## Grade an agent in one line
+
+```sh
+uvx --from git+https://github.com/KaiCalls/smb-voice-bench smb-voice-bench grade --agent reference-bad --output ./bench-grade
+```
+
+This runs all seven cases with the faulty scripted reference and writes `bench-grade/GRADE.md`, `grade.json` and `badge.svg`. It gets an F; `--agent reference-good` gets an A. To grade your own agent, export one bundle per case (see [Use your own harness](#use-your-own-harness)) and pass a run list: `smb-voice-bench grade --input ./runs.json --output ./bench-grade`. No `uv`? `pipx install git+https://github.com/KaiCalls/smb-voice-bench` works too. The git install resolves dependencies without hash checks; use the locked quickstart below when you need a verified install.
+
+How the letter works:
+
+- The letter is the number of the seven cases that passed: 7 is A, 6 is B, 5 is C, 4 is D, 3 or fewer is F. A case passes only when every run of it passes and no final status was shown false.
+- Three cases are mandatory: `duplicate-write-prevention`, `unknown-write-reconciliation` and `no-consent-no-write`. If any of them does not pass, the grade is at most D. A second booking, or a booking the caller declined, is never a B.
+- Unknown evidence never passes. A missing case means no letter, and the command exits `2`.
+- `--min-grade B` gates CI: exit `0` at or above the letter, `1` below, `2` incomplete. Without it, the exit codes follow the rules under [Commands](#commands).
+- The letter covers functional booking outcomes on synthetic tools. Speech, timing, listening and repeatability stay separate verdicts under `evaluate --scope audio-release`. A grade is not a certification.
+
+## Run it from your coding agent
+
+The repository is a Claude Code plugin marketplace. In Claude Code:
+
+```
+/plugin marketplace add KaiCalls/smb-voice-bench
+/plugin install smb-voice-bench@smb-voice-bench
+```
+
+Then ask it to "grade my receptionist with smb voice bench". The skill installs the bench, shows a reference grade, then reads your agent's code to build the per-case harness and grades it. It asks before spending money on model calls. For Codex, Cursor and other agents that read `SKILL.md` skills, copy `plugin/skills/smb-voice-bench/` into that agent's skills folder.
+
 ## Release downloads
 
 [v0.1.0 GitHub release](https://github.com/KaiCalls/smb-voice-bench/releases/tag/v0.1.0) provides the installable wheel, source archive, locked dependencies, checksums and signed build provenance. See [release installation and verification](docs/releases/v0.1.0.md). Distribution uses GitHub release assets; a PyPI upload is not configured.
@@ -55,6 +82,7 @@ smb-voice-bench review-template --input ./imported --output ./human-review.json
 smb-voice-bench evaluate --input ./imported --reviews ./reviews.json --output ./reviewed --scope audio-release
 smb-voice-bench compare --baseline ./baseline.json --candidate ./candidate.json --change 'Describe the intended configuration change' --scope functional --output ./comparison
 smb-voice-bench report --input ./evaluation --output ./rendered-report
+smb-voice-bench grade --input ./runs.json --output ./grade --min-grade B
 ```
 
 Outputs are new private directories or a new review file; overwrite is refused. Parent directories must already exist. Resolve operating-system aliases such as `/tmp` to their real directory (often `/private/tmp` on macOS): every filesystem component is checked for symlinks. Failed/interrupted staging directories retain an `.incomplete-smb-` prefix. Do not reuse an unknown operation to obtain a fresh attempt.
