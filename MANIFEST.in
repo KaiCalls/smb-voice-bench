@@ -11,3 +11,5 @@ exclude src/smb_voice_bench.egg-info/*
 global-exclude *.py[cod]
 include requirements-dev.in requirements-dev.lock
 include .github/workflows/release.yml
+include .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json
+recursive-include plugin *.md

@@ -17,6 +17,7 @@ from .evaluate import evaluate, exit_code
 from .reviews import read_reviews, template
 from .compare import collect, compare_records
 from .report import render_run, render_comparison
+from . import grade as suite_grade
 
 class Parser(argparse.ArgumentParser):
     def error(self,message):
@@ -27,11 +28,11 @@ def parser():
     p.add_argument('--version',action='version',version=__version__)
     p.add_argument('--json',action='store_true')
     commands=p.add_subparsers(dest='command',required=True,parser_class=Parser)
-    for name in ('catalog','doctor','demo','simulate','validate','import','evaluate','review-template','compare','report'):
+    for name in ('catalog','doctor','demo','simulate','validate','import','evaluate','review-template','compare','report','grade'):
         sub=commands.add_parser(name)
         sub.add_argument('--json',action='store_true',default=argparse.SUPPRESS)
         if name in ('validate','import','evaluate','review-template','report'): sub.add_argument('--input',required=True)
-        if name in ('demo','simulate','import','evaluate','review-template','compare','report'): sub.add_argument('--output',required=True)
+        if name in ('demo','simulate','import','evaluate','review-template','compare','report','grade'): sub.add_argument('--output',required=True)
         if name=='simulate':
             sub.add_argument('--scenario',required=True,choices=IDS)
             sub.add_argument('--agent',required=True,choices=('reference-good','reference-bad'))
@@ -41,6 +42,12 @@ def parser():
         if name=='compare':
             sub.add_argument('--baseline',required=True); sub.add_argument('--candidate',required=True)
             sub.add_argument('--change',required=True,help='Explicit description of the intended configuration change')
+        if name=='grade':
+            source=sub.add_mutually_exclusive_group(required=True)
+            source.add_argument('--input',help='run_list selector of captured bundles, one or more per case')
+            source.add_argument('--agent',choices=('reference-good','reference-bad'),help='Simulate all seven cases with a scripted reference')
+            sub.add_argument('--reviews')
+            sub.add_argument('--min-grade',choices=tuple(suite_grade.LETTERS))
     return p
 
 def copy_source(output,bundle):
@@ -111,6 +118,29 @@ def dispatch(args):
             if outcomes!=[1,0]: raise Invalid('reference expected-outcome detection failed')
         return dict(output=args.output,expected_failure_detected=True,corrected_functional_pass=True,
                     label='scripted reference demonstration',audio='unavailable',release_assessment='insufficient_evidence'),0
+    if name=='grade':
+        reviews=read_reviews(args.reviews); runs=[]
+        with atomic_output(args.output) as output:
+            if args.agent:
+                (output/'sources').mkdir(mode=0o700)
+                paths=[]
+                for scenario_id in IDS:
+                    path=output/'sources'/scenario_id; path.mkdir(mode=0o700)
+                    simulate_into(path,scenario_id,args.agent); paths.append(path)
+            else:
+                paths=selection(args.input,'run_list')
+            seen=set()
+            for path in paths:
+                bundle=read_bundle(path)
+                if bundle.manifest['run_id'] in seen: raise Invalid('same run selected twice')
+                seen.add(bundle.manifest['run_id'])
+                runs.append((bundle.manifest['scenario_id'],bundle.manifest['run_id'],evaluate(bundle,reviews)))
+            card=suite_grade.grade(runs)
+            write_json(output,'grade.json',card)
+            write_bytes(output,'GRADE.md',suite_grade.markdown(card).encode())
+            write_bytes(output,'badge.svg',suite_grade.badge(card).encode())
+        return dict(letter=card['letter'],passed=card['passed'],total=card['total'],capped_by_mandatory=card['capped_by_mandatory'],
+                    missing_scenarios=card['missing_scenarios'],scope=card['scope'],output=args.output),suite_grade.exit_code(card,args.min_grade)
     if name=='report':
         source=Path(args.input)
         if (source/'comparison.json').is_file():

@@ -1,0 +1,14 @@
+{
+  "name": "smb-voice-bench",
+  "owner": {
+    "name": "KaiCalls",
+    "url": "https://github.com/KaiCalls"
+  },
+  "plugins": [
+    {
+      "name": "smb-voice-bench",
+      "source": "./plugin",
+      "description": "Grade an AI receptionist A to F on seven offline booking cases: double bookings, bookings without consent, lost tool replies and honest status."
+    }
+  ]
+}
