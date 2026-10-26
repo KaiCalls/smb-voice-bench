@@ -1,5 +1,6 @@
 {
   "name": "smb-voice-bench",
+  "description": "Offline A to F grading for AI receptionists and booking agents.",
   "owner": {
     "name": "KaiCalls",
     "url": "https://github.com/KaiCalls"
