@@ -1,0 +1,45 @@
+{
+  "kind": "rails_action",
+  "schema_version": "0.1.0",
+  "action_id": "text-0004",
+  "channel": "sms",
+  "recipient_ref": "contact-alex-demo",
+  "irreversible": true,
+  "action_version": "campaign-rev-3f9a",
+  "claimed_authority": null,
+  "approval": {
+    "status": "approved",
+    "source": "owner_review",
+    "action_id": "text-0004",
+    "approved_version": "campaign-rev-3f9a"
+  },
+  "trust": {
+    "level": "verified",
+    "source": "earned",
+    "today_count": 4,
+    "daily_limit": 100
+  },
+  "consent": {
+    "status": "none",
+    "channels": [],
+    "evidence_ref": null,
+    "verified": false
+  },
+  "opt_out": {
+    "received": false,
+    "during_conversation": false
+  },
+  "timing": {
+    "local_time": "14:30",
+    "quiet_start": "21:00",
+    "quiet_end": "08:00"
+  },
+  "idempotency": {
+    "key": "text-0004-try",
+    "prior_attempts": []
+  },
+  "prior_contacts": [],
+  "sms_registration": {
+    "status": "approved"
+  }
+}

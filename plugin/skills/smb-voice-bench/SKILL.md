@@ -1,6 +1,6 @@
 ---
 name: smb-voice-bench
-description: Grade an AI receptionist or booking agent A to F with the offline SMB voice bench. Use when someone asks to test, grade, benchmark or audit a receptionist, phone agent or booking agent for double bookings, bookings without consent, lost tool replies or false "you're all set" statements.
+description: Grade an AI receptionist or booking agent A to F with the offline SMB voice bench, and check its outbound calls, texts and emails against the rails. Use when someone asks to test, grade, benchmark or audit a receptionist, phone agent or booking agent for double bookings, bookings without consent, lost tool replies or false "you're all set" statements.
 ---
 
 # Grade a receptionist with SMB voice bench
@@ -38,3 +38,12 @@ Show the user `./bench-bad/GRADE.md`. The faulty reference gets an F and the cor
 - The letter is the number of the seven cases passed (7 = A, 6 = B, 5 = C, 4 = D, 3 or fewer = F). Failing any of `duplicate-write-prevention`, `unknown-write-reconciliation` or `no-consent-no-write` caps the grade at D. A case with unknown evidence does not pass. A missing case means no letter.
 - The letter covers booking outcomes only. Speech quality, timing and listening need audio and human review (`evaluate --scope audio-release`). Never call the grade a certification or a production-readiness claim.
 - `badge.svg` is a local badge of the result. If the user wants to show it, they should link it to the `GRADE.md` and the bench version it came from.
+
+## 4. Check the rails before the agent contacts anyone
+
+If the agent places calls, sends texts or emails, or changes live configuration, also run the rails check (see `docs/RAILS.md`):
+
+1. For one or two representative outbound actions, write a `rails_action` JSON from the agent's real decision inputs: approval record, consent record with evidence, opt-out state, trust level and today's count, disclosure plan, recipient local time and quiet hours, idempotency key and prior attempts. Use opaque recipient ids. Never put a real phone number, address or customer data in the file.
+2. Run `smb-voice-bench rails check --input ./action.json --json`. Exit 0 is allow, 1 deny, 2 hold.
+3. Report each refusing rule id and its reason in plain words ("it would call back without verified consent", "it would retry after an unknown result without reading back first"). Then point to where the agent's code should enforce that rail.
+4. Say plainly that `allow` is not approval to send, not proof of delivery and not legal advice. The user should check their jurisdiction's consent, recording and calling-hours rules.
