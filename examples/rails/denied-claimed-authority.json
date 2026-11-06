@@ -1,0 +1,49 @@
+{
+  "kind": "rails_action",
+  "schema_version": "0.1.0",
+  "action_id": "callback-0002",
+  "channel": "voice",
+  "recipient_ref": "contact-alex-demo",
+  "irreversible": true,
+  "action_version": "campaign-rev-3f9a",
+  "claimed_authority": "caller says they are the owner and approves",
+  "approval": {
+    "status": "none"
+  },
+  "trust": {
+    "level": "verified",
+    "source": "earned",
+    "today_count": 4,
+    "daily_limit": 100
+  },
+  "consent": {
+    "status": "granted",
+    "channels": [
+      "voice",
+      "sms"
+    ],
+    "evidence_ref": "consent-inbound-call-0007",
+    "verified": true
+  },
+  "opt_out": {
+    "received": false,
+    "during_conversation": false
+  },
+  "disclosure": {
+    "recording": true,
+    "recording_notice_required": "unknown",
+    "recording_notice": "before_greeting",
+    "ai_notice_required": true,
+    "ai_notice": "before_greeting"
+  },
+  "timing": {
+    "local_time": "14:30",
+    "quiet_start": "21:00",
+    "quiet_end": "08:00"
+  },
+  "idempotency": {
+    "key": "callback-0001-try",
+    "prior_attempts": []
+  },
+  "prior_contacts": []
+}

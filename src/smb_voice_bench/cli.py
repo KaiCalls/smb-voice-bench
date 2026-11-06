@@ -18,6 +18,7 @@ from .reviews import read_reviews, template
 from .compare import collect, compare_records
 from .report import render_run, render_comparison
 from . import grade as suite_grade
+from . import rails
 
 class Parser(argparse.ArgumentParser):
     def error(self,message):
@@ -48,6 +49,11 @@ def parser():
             source.add_argument('--agent',choices=('reference-good','reference-bad'),help='Simulate all seven cases with a scripted reference')
             sub.add_argument('--reviews')
             sub.add_argument('--min-grade',choices=tuple(suite_grade.LETTERS))
+    sub=commands.add_parser('rails',help='Offline rails check of a proposed outbound action')
+    checks=sub.add_subparsers(dest='rails_command',required=True,parser_class=Parser)
+    check=checks.add_parser('check')
+    check.add_argument('--json',action='store_true',default=argparse.SUPPRESS)
+    check.add_argument('--input',required=True,help='rails_action or rails_batch JSON file')
     return p
 
 def copy_source(output,bundle):
@@ -141,6 +147,10 @@ def dispatch(args):
             write_bytes(output,'badge.svg',suite_grade.badge(card).encode())
         return dict(letter=card['letter'],passed=card['passed'],total=card['total'],capped_by_mandatory=card['capped_by_mandatory'],
                     missing_scenarios=card['missing_scenarios'],scope=card['scope'],output=args.output),suite_grade.exit_code(card,args.min_grade)
+    if name=='rails':
+        source=Path(os.path.abspath(args.input))
+        response=rails.check_document(read_json(source.parent,source.name))
+        return response,rails.exit_code(response)
     if name=='report':
         source=Path(args.input)
         if (source/'comparison.json').is_file():

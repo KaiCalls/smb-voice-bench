@@ -24,6 +24,16 @@ How the letter works:
 - `--min-grade B` gates CI: exit `0` at or above the letter, `1` below, `2` incomplete. Without it, the exit codes follow the rules under [Commands](#commands).
 - The letter covers functional booking outcomes on synthetic tools. Speech, timing, listening and repeatability stay separate verdicts under `evaluate --scope audio-release`. A grade is not a certification.
 
+## Rails
+
+[Rails](docs/RAILS.md) are the safety rules for any voice, SMS or email agent before it contacts someone or does something it cannot take back: owner review over claimed authority, approval bound to an exact version, earned trust and daily limits, consent with evidence, opt-out, disclosures before the greeting, quiet hours, idempotent retries, honest status words and read-back. Check one proposed action offline:
+
+```sh
+smb-voice-bench rails check --input examples/rails/allowed-callback.json --json
+```
+
+It prints `allow`, `deny` or `hold` with a rule id and reason for each refusal, and exits `0`, `1` or `2`. It checks the facts you give it, contacts nothing and is not legal advice.
+
 ## Run it from your coding agent
 
 The repository is a Claude Code plugin marketplace. In Claude Code:
@@ -83,6 +93,7 @@ smb-voice-bench evaluate --input ./imported --reviews ./reviews.json --output ./
 smb-voice-bench compare --baseline ./baseline.json --candidate ./candidate.json --change 'Describe the intended configuration change' --scope functional --output ./comparison
 smb-voice-bench report --input ./evaluation --output ./rendered-report
 smb-voice-bench grade --input ./runs.json --output ./grade --min-grade B
+smb-voice-bench rails check --input ./action.json --json
 ```
 
 Outputs are new private directories or a new review file; overwrite is refused. Parent directories must already exist. Resolve operating-system aliases such as `/tmp` to their real directory (often `/private/tmp` on macOS): every filesystem component is checked for symlinks. Failed/interrupted staging directories retain an `.incomplete-smb-` prefix. Do not reuse an unknown operation to obtain a fresh attempt.

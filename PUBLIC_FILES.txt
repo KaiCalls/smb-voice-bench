@@ -15,10 +15,16 @@ docs/CONTRACTS.md
 docs/INTEGRATION.md
 docs/METHODS.md
 docs/MIGRATION.md
+docs/RAILS.md
 docs/RELEASE.md
 docs/VERIFICATION.md
 docs/releases/v0.1.0.md
 examples/conformance_writer.py
+examples/rails/allowed-callback.json
+examples/rails/deferred-quiet-hours.json
+examples/rails/denied-claimed-authority.json
+examples/rails/denied-missing-consent.json
+examples/rails/hold-unknown-prior-write.json
 plugin/.claude-plugin/plugin.json
 plugin/skills/smb-voice-bench/SKILL.md
 pyproject.toml
@@ -39,6 +45,7 @@ src/smb_voice_bench/evaluate.py
 src/smb_voice_bench/grade.py
 src/smb_voice_bench/import_runs.py
 src/smb_voice_bench/metrics.py
+src/smb_voice_bench/rails.py
 src/smb_voice_bench/reference_agents.py
 src/smb_voice_bench/report.py
 src/smb_voice_bench/reviews.py
@@ -60,6 +67,7 @@ tests/test_contracts.py
 tests/test_evidence.py
 tests/test_grade.py
 tests/test_public_inventory.py
+tests/test_rails.py
 tests/test_reference.py
 tests/test_sandbox.py
 tools/browser_qa.cjs

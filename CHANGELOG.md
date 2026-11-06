@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+`rails check` command and [docs/RAILS.md](docs/RAILS.md): an offline, deterministic check of one proposed call, text or email (or a batch) against 19 named rails, returning `allow`, `deny` or `hold` with rule ids and reasons. Exit `0` allow, `1` deny, `2` hold, `3` invalid input. Five fictional examples live in `examples/rails/`. The seven frozen booking cases are unchanged.
+
 `grade` command: an A to F letter over the seven cases from captured bundles (`--input`) or a scripted reference (`--agent`), written as `grade.json`, `GRADE.md` and `badge.svg`. Three mandatory cases cap the grade at D, unknown evidence never passes, and a missing case gives no letter. `--min-grade` gates CI. The repository is now a Claude Code plugin marketplace with a `smb-voice-bench` skill, and the README documents a one-line `uvx` install from git.
 
 ## 0.1.0 — 2026-10-20
